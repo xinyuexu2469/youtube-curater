@@ -1875,6 +1875,26 @@ body {
                 </div>
             </div>
             
+                <!-- 观后感编辑模态框（用于已看页面和频道编辑内的单条观后感快速编辑） -->
+                <div id="notesEditModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>编辑观后感</h2>
+                            <button class="close-btn" id="closeNotesModal">
+                                <span class="close-icon">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="notesTextarea" style="display:block; margin-bottom:8px; color:var(--text-secondary);">观后感（支持换行，输入框留有足够空间）</label>
+                            <textarea id="notesTextarea" rows="12" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-family:inherit; font-size:14px; resize:vertical;"></textarea>
+                        </div>
+                        <div class="modal-footer" style="display:flex; gap:8px; justify-content:flex-end; padding:16px;">
+                            <button id="cancelNotesBtn" class="filter-btn" style="background:#f5f6f8; color:var(--text-primary);">取消</button>
+                            <button id="saveNotesBtn" class="filter-btn" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white;">保存</button>
+                        </div>
+                    </div>
+                </div>
+
             <!-- 已看视频页面 -->
             <div id="watchedVideosPage" class="page">
                 <div class="page-header">
@@ -1944,6 +1964,32 @@ body {
                         <!-- 视频列表将在这里动态生成 -->
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频编辑模态：用于编辑视频的标题、链接与观后感（替代内嵌编辑） -->
+    <div id="videoEditModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑视频信息</h2>
+                <button class="close-btn" id="closeVideoModal">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <label>视频链接</label>
+                    <input id="videoModalUrl" type="url" style="padding:10px; border-radius:8px; border:1px solid var(--border-color); font-family:inherit;">
+                    <label>视频标题（可选）</label>
+                    <input id="videoModalTitle" type="text" style="padding:10px; border-radius:8px; border:1px solid var(--border-color); font-family:inherit;">
+                    <label>观后感（支持换行）</label>
+                    <textarea id="videoModalNotes" rows="10" style="padding:12px; border-radius:8px; border:1px solid var(--border-color); font-family:inherit; resize:vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:8px; justify-content:flex-end; padding:16px;">
+                <button id="cancelVideoBtn" class="filter-btn" style="background:#f5f6f8; color:var(--text-primary);">取消</button>
+                <button id="saveVideoBtn" class="filter-btn" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white;">保存</button>
             </div>
         </div>
     </div>
@@ -3287,11 +3333,72 @@ const channelsData = [
     }
 ];
 
+// 根据用户要求批量设置评分：名单中的频道设为 5 星，其他设为 4 星
+(function applyUserRatings() {
+    // 用户提供的需要设为 5 星的频道名单（尽量使用原始名字或关键子串）
+    const fiveStarNames = [
+        // 高效学习（星标）
+        'Ali Abdaal', 'Elizabeth Filips', 'Sienna Santer', 'Holly Gabrielle', 'Ruby Granger',
+        // 高效学习（其他推荐）
+        'UnJaded Jade', 'Thomas Frank', 'Tiago Forte', 'Breanna Quan', 'Mmiakim', "Matt D'Avella", 'Kharma Medic',
+        // 英语学习
+        "Veronika's Language Diaries", 'English Fluency Journey', 'Speak English With Tiffany', 'Chen Lily',
+        // 职场成长
+        'Lillian Chiu', 'Matt Huang', 'Leila Hormozi',
+        // 北美亚裔生活
+        'Yoora Jung', 'Saranghoe', 'Tracy', 'Michelle Choi', 'Yoon Kai', 'Mikayla Mags', 'Jusuf',
+        // 海外华人生活
+        'Breanna Quan', 'itsyuyan', 'Oh Emma', 'ReginaKnowsss', 'Savislook', 'VickySoupsss', 'Hola! Fiona', 'Rainie Tian', 'Miwivon', 'Meng Mao', 'Krysti Naaa', 'Annbition', 'Renasteps', 'Hilary Chen', 'Della Qin', 'Anny Shi', '胖丁 Wenning', 'Phiphiwearswhat', 'Nuria Ma',
+        // 英音学习
+        'Dr Izzy Sealey', 'Zeliha Akpinar', 'Zoella', 'Ellen Miller', 'emmaxolouise',
+        // 治愈系生活
+        'ur mom ashley', 'Natalie Lynn', "Leah's Fieldnotes", 'craziejulia',
+        // 情感与成长
+        'Malama Life', 'Rowena Tsai', 'Alyssa Lenore', 'Jasmine Lipska', 'MuchelleB', 'Moya Mawhinney', 'Natalie Barbu', 'Lavendaire',
+        // 娱乐
+        'Hailey Rhode Bieber',
+        // 生活方式
+        'Kate Brock', 'Caitlin Lam',
+        // 健身与自律
+        'Pick Up Limes', 'Sanne Vloet', 'LenaLifts',
+        // 时尚与美妆
+        'Tam Kaur', 'Sincerely, Sarah',
+        // 阅读与思考
+        'Jack Edwards', 'Robin Waldun', 'e m m i e', 'JustAli', 'Productivity Game',
+        // 创意设计
+        'Great Art Explained', 'Curious Muse', 'Mackenzie Child',
+        // 美术手工
+        'Katie Moody',
+        // 综合科普
+        'Skillshare', 'CrashCourse', 'The School of Life', 'Overthink Podcast', 'Kurzgesagt', 'Tiff In Tech', 'Nobody & The Computer',
+        // 英文绘本
+        'Storyline Online', 'Brightly Storytime', 'StoryTime PlayTime', 'Reading is'
+    ];
+
+    // 规范化匹配（去除空白、标点并转小写），支持宽松包含匹配，兼容中英文名和符号差异
+    const normalize = s => (s || '').toString().toLowerCase().replace(/[^\p{L}\p{N}\u4e00-\u9fff]+/gu, '');
+    const normalizedFive = fiveStarNames.map(normalize).filter(Boolean);
+
+    channelsData.forEach(category => {
+        category.channels.forEach(channel => {
+            const nameNorm = normalize(channel.name);
+            const isFive = normalizedFive.some(fn => fn && (nameNorm.includes(fn) || fn.includes(nameNorm)));
+            channel.rating = isFive ? 5 : 4;
+        });
+    });
+    // 保存当前（修改后）的初始快照，用于在“清除数据”时恢复到此状态
+    window.initialChannelsSnapshot = JSON.parse(JSON.stringify(channelsData));
+})();
+
 // 收藏夹功能
 let favorites = JSON.parse(localStorage.getItem('youtubeFavorites') || '[]');
 let currentView = 'all'; // 'all' 或 'favorites' 或 'watched'
 let watchedVideos = JSON.parse(localStorage.getItem('watchedVideos') || '{}'); // 存储格式：{channelName: [{url, title, notes, date}]}
 let currentEditingChannel = null;
+// 当前正在通过模态编辑的上下文（用于观后感编辑）
+let notesEditingContext = null;
+// 视频编辑模态上下文
+let videoEditContext = null;
 
 // 页面切换功能
 function switchPage(pageId) {
@@ -3345,13 +3452,16 @@ function renderChannels(data, searchTerm = '') {
 
     let hasResults = false;
 
+    // 规范化搜索词，防止传入非字符串或含前后空白导致匹配失败
+    searchTerm = (searchTerm || '').toString().trim();
+
     data.forEach(categoryData => {
         const filteredChannels = categoryData.channels.filter(channel => {
             if (!searchTerm) return true;
             const term = searchTerm.toLowerCase();
-            return channel.name.toLowerCase().includes(term) ||
-                   channel.description.toLowerCase().includes(term) ||
-                   channel.region.toLowerCase().includes(term);
+            return (channel.name || '').toLowerCase().includes(term) ||
+                   ((channel.description || '').toLowerCase().includes(term)) ||
+                   ((channel.region || '').toLowerCase().includes(term));
         });
 
         if (filteredChannels.length > 0) {
@@ -3367,6 +3477,9 @@ function renderChannels(data, searchTerm = '') {
             } else {
                 title.textContent = categoryData.category;
             }
+
+            // 按评分降序排序（高分在前）
+            filteredChannels.sort((a, b) => (b.rating || 0) - (a.rating || 0));
 
             const grid = document.createElement('div');
             grid.className = 'channels-grid';
@@ -3557,6 +3670,9 @@ function renderFavoritesPage() {
         categoryTitle.innerHTML = `${category} <span class="star-icon">⭐</span>`;
         categorySection.appendChild(categoryTitle);
         
+        // 在显示前按 rating 降序排序
+        categoriesMap[category].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
         const channelsGrid = document.createElement('div');
         channelsGrid.className = 'channels-grid';
         
@@ -3606,37 +3722,52 @@ function renderWatchedVideosPage() {
     emptyState.style.display = 'none';
     container.innerHTML = '';
     
-    // 按频道分组显示
-    Object.keys(watchedVideos).forEach(channelName => {
-        const videos = watchedVideos[channelName];
-        if (videos.length > 0) {
-            
-            const channelGroup = document.createElement('div');
-            channelGroup.className = 'channel-group';
-            
-            channelGroup.innerHTML = `
-                <div class="channel-group-header">
-                    ${channelName} (${videos.length} 个视频)
-                </div>
-                <div class="channel-group-content">
-                    ${videos.map(video => `
-                        <div class="watched-video-item">
-                            <div class="watched-video-content">
-                                <div class="watched-video-title">${video.title || '无标题'}</div>
-                                <a href="${video.url}" target="_blank" class="watched-video-url">${video.url}</a>
-                                <div class="watched-video-notes">${video.notes || '暂无观后感'}</div>
-                            </div>
-                            <div class="watched-video-actions">
-                                <button class="edit-watched-notes-btn" data-channel="${channelName}" data-url="${video.url}">编辑</button>
-                                <button class="delete-watched-video-btn" data-channel="${channelName}" data-url="${video.url}">删除</button>
-                            </div>
+    // 将有已看视频的频道构造成数组，包含 rating，用于按 rating 排序后渲染
+    const watchedChannelList = Object.keys(watchedVideos).map(channelName => {
+        return {
+            name: channelName,
+            videos: watchedVideos[channelName] || [],
+            rating: (function() {
+                // 尝试从 channelsData 中找到对应频道的 rating
+                for (const category of channelsData) {
+                    for (const ch of category.channels) {
+                        if (ch.name === channelName) return ch.rating || 0;
+                    }
+                }
+                return 0;
+            })()
+        };
+    }).filter(c => c.videos.length > 0);
+
+    // 按 rating 降序
+    watchedChannelList.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+    watchedChannelList.forEach(({name: channelName, videos}) => {
+        const channelGroup = document.createElement('div');
+        channelGroup.className = 'channel-group';
+
+        channelGroup.innerHTML = `
+            <div class="channel-group-header">
+                ${channelName} (${videos.length} 个视频)
+            </div>
+            <div class="channel-group-content">
+                ${videos.map(video => `
+                    <div class="watched-video-item">
+                        <div class="watched-video-content">
+                            <div class="watched-video-title">${video.title || '无标题'}</div>
+                            <a href="${video.url}" target="_blank" class="watched-video-url">${video.url}</a>
+                            <div class="watched-video-notes">${video.notes || '暂无观后感'}</div>
                         </div>
-                    `).join('')}
-                </div>
-            `;
-            
-            container.appendChild(channelGroup);
-        }
+                        <div class="watched-video-actions">
+                            <button class="edit-watched-notes-btn" data-channel="${channelName}" data-url="${video.url}">编辑</button>
+                            <button class="delete-watched-video-btn" data-channel="${channelName}" data-url="${video.url}">删除</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        container.appendChild(channelGroup);
     });
 }
 
@@ -3895,7 +4026,7 @@ function findChannelByName(name) {
 
 // 搜索功能
 document.getElementById('searchInput').addEventListener('input', (e) => {
-    const searchTerm = e.target.value;
+    const searchTerm = (e.target.value || '').toString().trim();
     const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category;
 
     let dataToSearch = channelsData;
@@ -3938,88 +4069,18 @@ document.addEventListener('click', (e) => {
         addVideo();
     }
     
-    // 编辑/保存按钮
+    // 编辑/保存按钮（改为模态编辑视频信息）
     if (e.target.classList.contains('edit-save-btn')) {
         const channelName = e.target.dataset.channel;
         const url = e.target.dataset.url;
-        const isEditing = e.target.dataset.editing === 'true';
-        const videoItem = e.target.closest('.video-item');
-        
-        // 获取所有显示和编辑元素
-        const titleDisplay = videoItem.querySelector('.video-title-display');
-        const titleEdit = videoItem.querySelector('.video-title-edit');
-        const urlDisplay = videoItem.querySelector('.video-url-display');
-        const urlEdit = videoItem.querySelector('.video-url-edit');
-        const notesDisplay = videoItem.querySelector('.video-notes-display');
-        const notesEdit = videoItem.querySelector('.video-notes-edit');
-        
-        if (isEditing) {
-            // 保存模式
-            const newTitle = titleEdit.value.trim();
-            const newUrl = urlEdit.value.trim();
-            const newNotes = notesEdit.value.trim();
-            
-            // 验证URL
-            if (!newUrl) {
-                alert('视频链接不能为空');
-                return;
-            }
-            
-            // 更新视频数据
-            updateVideoData(channelName, url, newTitle, newUrl, newNotes);
-            
-            // 切换回显示模式
-            titleDisplay.textContent = newTitle || '无标题';
-            titleDisplay.style.display = 'block';
-            titleEdit.style.display = 'none';
-            
-            urlDisplay.textContent = newUrl;
-            urlDisplay.href = newUrl;
-            urlDisplay.style.display = 'block';
-            urlEdit.style.display = 'none';
-            
-            notesDisplay.textContent = newNotes || '暂无观后感';
-            notesDisplay.style.display = 'block';
-            notesEdit.style.display = 'none';
-            
-            // 更新按钮
-            e.target.innerHTML = `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                编辑
-            `;
-            e.target.dataset.editing = 'false';
-            
-            // 更新video-item的data-url属性
-            videoItem.dataset.url = newUrl;
-        } else {
-            // 编辑模式
-            titleEdit.value = titleDisplay.textContent === '无标题' ? '' : titleDisplay.textContent;
-            titleDisplay.style.display = 'none';
-            titleEdit.style.display = 'block';
-            
-            urlEdit.value = urlDisplay.href;
-            urlDisplay.style.display = 'none';
-            urlEdit.style.display = 'block';
-            
-            notesEdit.value = notesDisplay.textContent === '暂无观后感' ? '' : notesDisplay.textContent;
-            notesDisplay.style.display = 'none';
-            notesEdit.style.display = 'block';
-            
-            // 聚焦到第一个输入框
-            titleEdit.focus();
-            
-            // 更新按钮
-            e.target.innerHTML = `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 6L9 17l-5-5"></path>
-                </svg>
-                保存
-            `;
-            e.target.dataset.editing = 'true';
-        }
+        const video = (watchedVideos[channelName] || []).find(v => v.url === url) || { title: '', notes: '' };
+
+        // 设置上下文并填充模态
+        videoEditContext = { channelName, oldUrl: url };
+        document.getElementById('videoModalUrl').value = url;
+        document.getElementById('videoModalTitle').value = video.title || '';
+        document.getElementById('videoModalNotes').value = video.notes || '';
+        document.getElementById('videoEditModal').style.display = 'block';
     }
     
     // 删除视频按钮
@@ -4029,15 +4090,18 @@ document.addEventListener('click', (e) => {
         deleteVideo(channelName, url);
     }
     
-    // 编辑已看视频页面中的观后感
+    // 编辑已看视频页面中的观后感（今后改为打开可编辑链接/标题/观后感的模态）
     if (e.target.classList.contains('edit-watched-notes-btn')) {
         const channelName = e.target.dataset.channel;
         const url = e.target.dataset.url;
-        const newNotes = prompt('请输入观后感：', watchedVideos[channelName].find(v => v.url === url).notes || '');
-        if (newNotes !== null) {
-            updateVideoNotes(channelName, url, newNotes);
-            renderWatchedVideosPage();
-        }
+        const video = (watchedVideos[channelName] || []).find(v => v.url === url) || { title: '', notes: '' };
+
+        // 复用视频编辑模态，支持编辑链接/标题/观后感
+        videoEditContext = { channelName, oldUrl: url };
+        document.getElementById('videoModalUrl').value = url;
+        document.getElementById('videoModalTitle').value = video.title || '';
+        document.getElementById('videoModalNotes').value = video.notes || '';
+        document.getElementById('videoEditModal').style.display = 'block';
     }
     
     // 删除已看视频页面中的视频
@@ -4055,6 +4119,110 @@ document.addEventListener('click', (e) => {
 document.getElementById('channelEditModal').addEventListener('click', (e) => {
     if (e.target.id === 'channelEditModal') {
         closeChannelEdit();
+    }
+});
+
+// 观后感模态 - 关闭 / 保存 逻辑
+document.getElementById('closeNotesModal').addEventListener('click', () => {
+    document.getElementById('notesEditModal').style.display = 'none';
+    notesEditingContext = null;
+});
+document.getElementById('cancelNotesBtn').addEventListener('click', () => {
+    document.getElementById('notesEditModal').style.display = 'none';
+    notesEditingContext = null;
+});
+document.getElementById('saveNotesBtn').addEventListener('click', () => {
+    if (!notesEditingContext) return;
+    const btn = document.getElementById('saveNotesBtn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+
+    const notes = document.getElementById('notesTextarea').value;
+    // 模拟短暂的保存过程以展示加载状态（实际保存为同步写入localStorage）
+    setTimeout(() => {
+        updateVideoNotes(notesEditingContext.channelName, notesEditingContext.url, notes);
+        btn.textContent = '已保存 ✓';
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            document.getElementById('notesEditModal').style.display = 'none';
+            // 重新渲染当前页面
+            if (currentView === 'watched') {
+                renderWatchedVideosPage();
+            } else if (currentView === 'favorites') {
+                showFavorites();
+            } else {
+                renderChannels(channelsData);
+            }
+            notesEditingContext = null;
+        }, 700);
+    }, 300);
+});
+
+// 点击模态外部区域时关闭 notesEditModal
+document.getElementById('notesEditModal').addEventListener('click', (e) => {
+    if (e.target.id === 'notesEditModal') {
+        document.getElementById('notesEditModal').style.display = 'none';
+        notesEditingContext = null;
+    }
+});
+
+// 视频编辑模态事件
+document.getElementById('closeVideoModal').addEventListener('click', () => {
+    document.getElementById('videoEditModal').style.display = 'none';
+    videoEditContext = null;
+});
+document.getElementById('cancelVideoBtn').addEventListener('click', () => {
+    document.getElementById('videoEditModal').style.display = 'none';
+    videoEditContext = null;
+});
+document.getElementById('saveVideoBtn').addEventListener('click', () => {
+    if (!videoEditContext) return;
+    const btn = document.getElementById('saveVideoBtn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+
+    const newUrl = document.getElementById('videoModalUrl').value.trim();
+    const newTitle = document.getElementById('videoModalTitle').value.trim();
+    const newNotes = document.getElementById('videoModalNotes').value;
+
+    if (!newUrl) {
+        alert('视频链接不能为空');
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+    }
+
+    setTimeout(() => {
+        updateVideoData(videoEditContext.channelName, videoEditContext.oldUrl, newTitle, newUrl, newNotes);
+        btn.textContent = '已保存 ✓';
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            document.getElementById('videoEditModal').style.display = 'none';
+            videoEditContext = null;
+
+            // 重新渲染当前视图
+            if (currentView === 'watched') {
+                renderWatchedVideosPage();
+            } else if (currentView === 'favorites') {
+                showFavorites();
+            } else {
+                renderChannels(channelsData);
+            }
+        }, 700);
+    }, 300);
+});
+
+// 点击模态外部区域时关闭 videoEditModal
+document.getElementById('videoEditModal').addEventListener('click', (e) => {
+    if (e.target.id === 'videoEditModal') {
+        document.getElementById('videoEditModal').style.display = 'none';
+        videoEditContext = null;
     }
 });
 
@@ -4154,7 +4322,8 @@ function exportData() {
             watchedVideos: getWatchedVideos(),
             ratings: getRatings(),
             timestamp: new Date().toISOString(),
-            version: '1.0'
+            version: '1.0',
+            channelsDataVersion: 'v1' // 可用于未来兼容性检查
         };
         
         const dataStr = JSON.stringify(data, null, 2);
@@ -4174,42 +4343,109 @@ function exportData() {
     }
 }
 
+// 将导入的数据迁移/规范化为当前版本所需的结构
+function migrateImportedData(data) {
+    if (!data || typeof data !== 'object') return data;
+
+    const migrated = Object.assign({}, data);
+
+    // favorites: 允许多种格式 -> 规范为数组
+    if (!Array.isArray(migrated.favorites)) {
+        if (migrated.favorites && typeof migrated.favorites === 'object') {
+            // 可能是 {name: true} 的形式
+            migrated.favorites = Object.keys(migrated.favorites).filter(k => migrated.favorites[k]);
+        } else {
+            migrated.favorites = [];
+        }
+    }
+
+    // watchedVideos: 期望为 {channelName: [{...}, ...]}，兼容旧版数组或其他格式
+    if (!migrated.watchedVideos || typeof migrated.watchedVideos !== 'object' || Array.isArray(migrated.watchedVideos)) {
+        // 如果是数组，尝试按照可能的旧结构转换
+        if (Array.isArray(migrated.watchedVideos)) {
+            const map = {};
+            migrated.watchedVideos.forEach(item => {
+                // 旧格式可能包含 channel 字段
+                const channel = item.channel || item.channelName || 'unknown';
+                if (!map[channel]) map[channel] = [];
+                map[channel].push({ url: item.url || item.link || '', title: item.title || '', notes: item.notes || '', date: item.date || new Date().toISOString() });
+            });
+            migrated.watchedVideos = map;
+        } else {
+            migrated.watchedVideos = {};
+        }
+    }
+
+    // ratings: 期望为 [{name, rating}]，兼容 {name:rating} 的 map
+    if (migrated.ratings && !Array.isArray(migrated.ratings) && typeof migrated.ratings === 'object') {
+        const arr = [];
+        Object.keys(migrated.ratings).forEach(name => {
+            arr.push({ name, rating: migrated.ratings[name] });
+        });
+        migrated.ratings = arr;
+    }
+
+    // 确保存在 ratings 字段
+    if (!Array.isArray(migrated.ratings)) migrated.ratings = [];
+
+    // 如果没有 version，可以设置为旧版本标记
+    if (!migrated.version) migrated.version = 'legacy';
+
+    return migrated;
+}
+
 function importData() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = function(event) {
         const file = event.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const data = JSON.parse(e.target.result);
-                
-                if (!data.favorites || !data.watchedVideos || !data.ratings) {
-                    throw new Error('数据格式不正确');
-                }
-                
-                if (confirm('确定要导入数据吗？这将覆盖当前所有数据！')) {
+                let data = JSON.parse(e.target.result);
+                // 先迁移/规范化数据以提高兼容性
+                data = migrateImportedData(data);
+
+                // 基本格式校验
+                if (!data || typeof data !== 'object') throw new Error('导入数据不是对象');
+                if (!Array.isArray(data.ratings)) throw new Error('ratings 应为数组');
+                if (typeof data.watchedVideos !== 'object' || data.watchedVideos === null) throw new Error('watchedVideos 格式不正确');
+                if (!Array.isArray(data.favorites)) data.favorites = Array.isArray(data.favorites) ? data.favorites : [];
+
+                if (confirm('确定要导入数据吗？这将覆盖当前所有本地数据（收藏/已看/评分）！')) {
+                    // 导入 ratings 并记录未匹配的项
+                    const unmatchedRatings = [];
                     data.ratings.forEach(rating => {
+                        let matched = false;
                         channelsData.forEach(category => {
                             category.channels.forEach(channel => {
                                 if (channel.name === rating.name) {
                                     channel.rating = rating.rating;
+                                    matched = true;
                                 }
                             });
                         });
+                        if (!matched) unmatchedRatings.push(rating.name);
                     });
-                    
-                    localStorage.setItem('youtubeFavorites', JSON.stringify(data.favorites));
-                    localStorage.setItem('watchedVideos', JSON.stringify(data.watchedVideos));
-                    
+
+                    // 写入 localStorage
+                    try {
+                        localStorage.setItem('youtubeFavorites', JSON.stringify(data.favorites));
+                        localStorage.setItem('watchedVideos', JSON.stringify(data.watchedVideos));
+                    } catch (err) {
+                        console.warn('写入 localStorage 失败：', err);
+                        alert('导入失败：无法写入本地存储');
+                        return;
+                    }
+
                     // 更新全局变量
                     favorites = data.favorites;
                     watchedVideos = data.watchedVideos;
-                    
+
                     // 重新渲染当前页面
                     if (currentView === 'favorites') {
                         renderFavoritesPage();
@@ -4218,10 +4454,16 @@ function importData() {
                     } else {
                         renderChannels(channelsData);
                     }
-                    
+
                     updateFavoritesCount();
                     updateWatchedCount();
-                    alert('数据导入成功！');
+
+                    // 提示导入结果
+                    if (unmatchedRatings.length > 0) {
+                        alert('导入完成，但以下评分项未能匹配到任何频道：\n' + unmatchedRatings.join(', '));
+                    } else {
+                        alert('数据导入成功！');
+                    }
                 }
             } catch (error) {
                 alert('数据导入失败：' + error.message);
@@ -4229,7 +4471,7 @@ function importData() {
         };
         reader.readAsText(file);
     };
-    
+
     input.click();
 }
 
@@ -4242,12 +4484,20 @@ function clearAllData() {
         // 重置全局变量
         favorites = [];
         watchedVideos = {};
-        
-        channelsData.forEach(category => {
-            category.channels.forEach(channel => {
-                channel.rating = 4;
+        // 恢复 channelsData 到初始快照（如果可用），否则保守地将评分设为 4
+        if (window.initialChannelsSnapshot) {
+            // 深拷贝以避免引用同一对象
+            const snapshot = JSON.parse(JSON.stringify(window.initialChannelsSnapshot));
+            // 用 snapshot 替换 channelsData 的内容
+            channelsData.length = 0;
+            snapshot.forEach(cat => channelsData.push(cat));
+        } else {
+            channelsData.forEach(category => {
+                category.channels.forEach(channel => {
+                    channel.rating = 4;
+                });
             });
-        });
+        }
         
         // 重新渲染当前页面
         if (currentView === 'favorites') {
@@ -4260,7 +4510,7 @@ function clearAllData() {
         
         updateFavoritesCount();
         updateWatchedCount();
-        alert('所有数据已清除！');
+        alert('所有本地数据已清除，页面已恢复到当前项目设置所显示的默认状态。');
     }
 }
 
