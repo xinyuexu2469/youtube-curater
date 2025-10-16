@@ -34,9 +34,80 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 0 20px;
+}
+
+/* 宽屏优化：当屏幕宽度超过1200px时，增加最大宽度 */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1800px;
+        padding: 0 40px;
+    }
+}
+
+/* 超宽屏优化：当屏幕宽度超过1600px时，进一步优化布局 */
+@media (min-width: 1600px) {
+    .container {
+        max-width: 2000px;
+        padding: 0 60px;
+    }
+    
+    /* 已看视频页面在超宽屏下的优化布局 */
+    .watched-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 20px;
+    }
+    
+    .channel-group {
+        max-width: none;
+    }
+    
+    /* 频道编辑页面在超宽屏下的优化 */
+    .modal-content {
+        max-width: 90vw;
+        max-height: 90vh;
+    }
+    
+    .watched-videos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    
+    .add-video-form {
+        grid-column: 1 / -1;
+    }
+    
+    /* 频道编辑页面的视频项目也采用垂直布局 */
+    .video-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .video-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e1e8ed;
+    }
+    
+    .video-content {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .video-actions {
+        padding: 16px 20px;
+        border-top: 1px solid #e1e8ed;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        align-items: center;
+    }
 }
 
 .header {
@@ -146,6 +217,21 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 25px;
+}
+
+/* 宽屏优化：增加频道卡片列数 */
+@media (min-width: 1200px) {
+    .channels-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .channels-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 35px;
+    }
 }
 
 .channel-card {
@@ -556,7 +642,7 @@ body {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 9999;
     left: 0;
     top: 0;
     width: 100%;
@@ -825,16 +911,61 @@ body {
 }
 
 .video-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 16px;
     margin-bottom: 12px;
     background: white;
     border: 1px solid #e1e8ed;
     border-radius: 10px;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.video-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.video-header:hover {
+    background-color: #f8f9fa;
+}
+
+.video-content {
+    padding: 0 16px 16px 16px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.video-content.collapsed {
+    max-height: 0;
+    padding: 0 16px;
+    opacity: 0;
+}
+
+.collapse-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    color: #6c757d;
+}
+
+.collapse-toggle-btn:hover {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.collapse-toggle-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.collapse-toggle-btn.collapsed svg {
+    transform: rotate(-90deg);
 }
 
 .video-item:hover {
@@ -1063,11 +1194,749 @@ body {
     box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
+/* 已看视频页面布局优化 */
+.watched-container {
+    max-width: 100%;
+}
+
+.channel-group {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.channel-group:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.channel-group-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.channel-group-content {
+    padding: 20px;
+}
+
+/* 宽屏下的视频项目布局优化 - 内容在标题下方展开 */
+@media (min-width: 1200px) {
+    .watched-video-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .watched-video-header {
+        padding: 16px 20px !important;
+        border-bottom: 1px solid #e1e8ed;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    
+    .watched-video-content {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .watched-video-actions {
+        padding: 16px 20px !important;
+        border-top: 1px solid #e1e8ed;
+        background-color: #f8f9fa;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+    }
+    
+    .action-buttons-group {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+}
+
+/* 强制全屏状态下的布局 - 最高优先级 */
+@media (min-width: 1920px) {
+    .watched-video-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 16px 20px !important;
+        border-bottom: 1px solid #e1e8ed !important;
+    }
+    
+    .watched-video-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        padding: 16px 20px !important;
+        border-top: 1px solid #e1e8ed !important;
+        background-color: #f8f9fa !important;
+    }
+    
+    .watched-video-title {
+        flex: 1 !important;
+        text-align: left !important;
+    }
+    
+    .collapse-toggle-btn {
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+    }
+    
+    .watched-video-actions button {
+        display: inline-flex !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* 频道编辑页面 - 超宽屏优化 */
+    .video-header {
+        padding: 20px 30px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    
+    .video-actions {
+        padding: 20px 30px !important;
+        gap: 12px !important;
+    }
+}
+
+/* 基础视频项目样式 */
+.watched-video-item {
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* 频道编辑页面 - 视频项目样式 */
+.video-item {
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+/* 频道编辑页面 - 视频标题行布局 */
+.video-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 16px;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.video-title-container {
+    flex: 1 !important;
+    margin-right: 16px !important;
+}
+
+.video-title-display {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* 频道编辑页面 - 操作按钮区域 */
 .video-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding: 16px;
+    border-top: 1px solid #e1e8ed;
+    background-color: #f8f9fa;
+}
+
+.video-actions button {
+    display: inline-flex !important;
+    flex-shrink: 0 !important;
+    padding: 6px 12px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+/* 频道编辑页面按钮样式 - 您要求的渐变色 */
+.video-actions .ai-assistant-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.video-actions .ai-assistant-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.video-actions .generate-ai-notes-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.video-actions .generate-ai-notes-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.video-actions .edit-save-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.video-actions .edit-save-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.video-actions .delete-video-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.video-actions .delete-video-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* 折叠按钮样式 */
+.collapse-toggle-btn {
+    background: #f8f9fa;
+    border: 1px solid #e1e8ed;
+    color: #6c757d;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.collapse-toggle-btn:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+}
+
+.collapse-toggle-btn.collapsed svg {
+    transform: rotate(-90deg);
+}
+
+.watched-video-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.watched-video-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.watched-video-header:hover {
+    background-color: #f8f9fa;
+}
+
+.watched-video-content {
+    padding: 0 16px 16px 16px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.watched-video-content.collapsed {
+    max-height: 0;
+    padding: 0 16px;
+    opacity: 0;
+}
+
+/* 基础样式中的按钮容器 - 已在上面的强制样式中定义 */
+
+.watched-video-display {
+    margin-bottom: 12px;
+}
+
+.watched-video-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.watched-video-url {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.watched-video-url:hover {
+    text-decoration: underline;
+}
+
+.watched-video-notes {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.ai-notes-display {
+    background: #f0f9ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* 编辑模式样式 */
+.watched-video-edit {
+    margin-bottom: 12px;
+}
+
+.edit-field {
+    margin-bottom: 12px;
+}
+
+.edit-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #5a6c7d;
+    margin-bottom: 4px;
+}
+
+.edit-title-input,
+.edit-url-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.edit-title-input:focus,
+.edit-url-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.edit-notes-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px 12px;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.edit-notes-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* 通用强制样式 - 确保在任何屏幕尺寸下都正确 */
+.watched-video-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.watched-video-title {
+    flex: 1 !important;
+    text-align: left !important;
+    margin-right: 16px !important;
+}
+
+.collapse-toggle-btn {
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+}
+
+.watched-video-header:hover {
+    background-color: #f8f9fa !important;
+}
+
+.watched-video-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* 确保按钮本身也是水平排列 */
+.watched-video-actions button {
+    display: inline-flex !important;
+    flex-shrink: 0 !important;
+}
+
+/* 折叠按钮样式 */
+.collapse-toggle-btn {
+    background: #f8f9fa;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.collapse-toggle-btn:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+}
+
+.collapse-toggle-btn.collapsed svg {
+    transform: rotate(-90deg);
+}
+
+.ai-assistant-btn,
+.generate-ai-notes-btn,
+.edit-watched-notes-btn,
+.save-watched-notes-btn,
+.cancel-watched-notes-btn,
+.delete-watched-video-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.ai-assistant-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.ai-assistant-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.generate-ai-notes-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.generate-ai-notes-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.edit-watched-notes-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.edit-watched-notes-btn:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    transform: translateY(-1px);
+}
+
+.save-watched-notes-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.save-watched-notes-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+}
+
+.cancel-watched-notes-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-watched-notes-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.delete-watched-video-btn {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+}
+
+.delete-watched-video-btn:hover {
+    background: linear-gradient(135deg, #c82333 0%, #dc2626 100%);
+    transform: translateY(-1px);
+}
+
+
+/* 快速建议样式 */
+.quick-suggestions {
+    background: #f8f9ff;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out;
+}
+
+.quick-suggestions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #e6f3ff;
+    border-bottom: 1px solid #b3d9ff;
+}
+
+.quick-suggestions-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1e40af;
+}
+
+.toggle-suggestions-btn {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.toggle-suggestions-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.quick-suggestions-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 12px;
+}
+
+.quick-suggestion-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.quick-suggestion-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+/* 聊天输入框样式更新 */
+.chat-input {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-width: 80px;
+}
+
+.chat-input textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+    max-height: 120px;
+    transition: border-color 0.3s ease;
+}
+
+.chat-input textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.chat-input-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.show-suggestions-btn {
+    background: #f8f9ff;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    padding: 8px;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.show-suggestions-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.send-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.send-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+}
+
+/* 浮动建议按钮 */
+.floating-suggestions-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 1000;
+    animation: floatIn 0.5s ease-out;
+}
+
+.floating-suggestions-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.floating-suggestions-btn:active {
+    transform: translateY(0);
+}
+
+/* 动画 */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .floating-suggestions-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 14px;
+        font-size: 0.8rem;
+    }
+    
+    .floating-suggestions-btn span {
+        display: none;
+    }
+    
+    .quick-suggestions-content {
+        flex-direction: column;
+    }
+    
+    .quick-suggestion-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.video-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .edit-save-btn,
@@ -1695,6 +2564,346 @@ body {
     }
 }
 
+/* 学习报告页面样式 */
+.report-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.report-controls .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.report-controls .filter-btn:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.report-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    min-height: 400px;
+}
+
+.report-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.report-placeholder .placeholder-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.report-placeholder h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.report-placeholder p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.report-placeholder ul {
+    text-align: left;
+    max-width: 400px;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.report-placeholder li {
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+/* 学习报告内容样式 */
+.learning-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.knowledge-map {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.knowledge-map h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.skill-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.skill-category {
+    background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 20px;
+    transition: var(--transition);
+}
+
+.skill-category:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.category-icon {
+    font-size: 1.5rem;
+}
+
+.category-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.category-progress {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.category-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.english-knowledge-base {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.english-knowledge-base h3 {
+    color: #1e40af;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vocabulary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.vocabulary-card {
+    background: white;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 15px;
+    transition: var(--transition);
+}
+
+.vocabulary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.1);
+}
+
+.vocabulary-word {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 5px;
+}
+
+.vocabulary-meaning {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.vocabulary-example {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+.review-schedule {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #f59e0b;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.review-schedule h3 {
+    color: #92400e;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-item {
+    background: white;
+    border: 1px solid #f59e0b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.review-content {
+    flex: 1;
+}
+
+.review-title {
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 5px;
+}
+
+.review-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.review-status {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.review-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.review-status.completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.learning-suggestions {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #10b981;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.learning-suggestions h3 {
+    color: #065f46;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.suggestion-item {
+    background: white;
+    border: 1px solid #10b981;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: var(--transition);
+}
+
+.suggestion-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.suggestion-title {
+    font-weight: 600;
+    color: #065f46;
+    margin-bottom: 8px;
+}
+
+.suggestion-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
 /* 重复的数据管理按钮样式已删除，功能已移至页面顶部 */
 
 /* 重复的数据管理按钮样式已删除 */
@@ -1737,6 +2946,666 @@ body {
     background: none !important;
     -webkit-background-clip: initial !important;
     background-clip: initial !important;
+}
+
+/* AI 学习助手样式 */
+.ai-assistant-modal {
+    max-width: 900px;
+    width: 95%;
+    height: 80vh;
+    max-height: 700px;
+}
+
+.ai-assistant-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.ai-context-panel {
+    background: #f8f9ff;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.ai-context-panel h4 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.context-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.context-item {
+    display: flex;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.context-item strong {
+    color: var(--text-primary);
+    min-width: 80px;
+}
+
+.context-item span {
+    color: var(--text-secondary);
+    flex: 1;
+    word-break: break-word;
+}
+
+.ai-extract-panel {
+    background: #f0f9ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.ai-extract-panel h4 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.extract-input-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.extract-input-container input {
+    flex: 1;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.extract-input-container input:focus {
+    border-color: #667eea;
+}
+
+.extract-btn {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.extract-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.extract-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.extract-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #92400e;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #f59e0b;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+.video-transcript {
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+}
+
+.video-transcript h5 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.video-transcript #transcriptContent {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ai-suggestions-panel {
+    background: #fff8f0;
+    border: 1px solid #f0e6d2;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.ai-suggestions-panel h4 {
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.suggestion-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category-tabs {
+    display: flex;
+    gap: 4px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #e1e8ed;
+}
+
+.category-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.category-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 500;
+}
+
+.category-tab:hover:not(.active) {
+    background: #f8f9ff;
+    color: var(--text-primary);
+}
+
+.suggestion-content {
+    position: relative;
+    min-height: 200px;
+}
+
+.suggestion-group {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.suggestion-group.active {
+    display: block;
+}
+
+.group-title {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    padding: 4px 8px;
+    background: #f0f9ff;
+    border-radius: 6px;
+    text-align: center;
+    font-style: italic;
+}
+
+.suggestion-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suggestion-btn {
+    background: #fff;
+    border: 1px solid #e1e8ed;
+    border-radius: 16px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.suggestion-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.suggestion-btn:hover::before {
+    left: 100%;
+}
+
+.suggestion-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* 知识学习类按钮 */
+.suggestion-group[data-category="knowledge"] .suggestion-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 生活成长类按钮 */
+.suggestion-group[data-category="life"] .suggestion-btn:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* 深度思考类按钮 */
+.suggestion-group[data-category="thinking"] .suggestion-btn:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* 英语学习类按钮 */
+.suggestion-group[data-category="english"] .suggestion-btn:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+/* 英语分析按钮特殊样式 */
+.english-analysis-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white !important;
+    border: 1px solid #7c3aed !important;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.english-analysis-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.english-analysis-btn:hover::before {
+    left: 100%;
+}
+
+.english-analysis-btn:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .category-tabs {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .category-tab {
+        font-size: 0.75rem;
+        padding: 6px 8px;
+    }
+    
+    .suggestion-buttons {
+        flex-direction: column;
+    }
+    
+    .suggestion-btn {
+        text-align: left;
+        white-space: normal;
+        padding: 10px 12px;
+    }
+}
+
+.ai-chat-container {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    overflow: visible;
+}
+
+.chat-messages {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ai-message, .user-message {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.ai-message .message-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.user-message .message-avatar {
+    background: #f0f3ff;
+    color: #667eea;
+}
+
+.message-content {
+    background: #f8f9ff;
+    padding: 12px 16px;
+    border-radius: 16px;
+    max-width: 70%;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.user-message .message-content {
+    background: #667eea;
+    color: white;
+}
+
+.message-content p {
+    margin: 0 0 8px 0;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.chat-input-container {
+    border-top: 1px solid #e1e8ed;
+    padding: 16px;
+    background: #fff;
+}
+
+.chat-input {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.chat-input textarea {
+    flex: 1;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s ease;
+    min-height: 40px;
+    max-height: 120px;
+}
+
+.chat-input textarea:focus {
+    border-color: #667eea;
+}
+
+.send-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ai-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.status-indicator {
+    color: #28a745;
+    font-size: 0.6rem;
+}
+
+.status-indicator.thinking {
+    color: #ffc107;
+    animation: pulse 1s infinite;
+}
+
+.status-indicator.error {
+    color: #dc3545;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .ai-assistant-modal {
+        width: 95%;
+        height: 90vh;
+        margin: 5% auto;
+    }
+    
+    .ai-assistant-body {
+        gap: 16px;
+    }
+    
+    .suggestion-buttons {
+        flex-direction: column;
+    }
+    
+    .suggestion-btn {
+        text-align: left;
+        white-space: normal;
+    }
+    
+    .message-content {
+        max-width: 85%;
+    }
+}
+
+/* AI 助手按钮样式 */
+.ai-assistant-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.ai-assistant-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.ai-assistant-btn svg {
+    flex-shrink: 0;
+}
+
+/* API 设置按钮 */
+.settings-btn {
+    background: #f0f3ff;
+    color: #667eea;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* AI 笔记相关样式 */
+.ai-notes-container {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    position: relative;
+}
+
+.ai-notes-label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: #0369a1;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.ai-notes-display {
+    color: #0f172a;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.ai-notes-display h3 {
+    color: #0369a1;
+    margin: 16px 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.ai-notes-display ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.ai-notes-display li {
+    margin: 4px 0;
+    color: #334155;
+}
+
+.ai-notes-display strong {
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.ai-notes-display p {
+    margin: 8px 0;
+    color: #475569;
+}
+
+/* 生成笔记按钮 */
+.generate-ai-notes-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.generate-ai-notes-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.generate-ai-notes-btn svg {
+    flex-shrink: 0;
 }
 
 /* 头部数据管理按钮样式 */
@@ -1851,6 +3720,10 @@ body {
                     <span class="btn-icon">📺</span>
                     <span class="btn-text">已看视频(<span id="watchedCount">0</span>)</span>
                 </button>
+                <button id="learningReportBtn" class="nav-btn learning-report-btn">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">学习报告</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1876,25 +3749,6 @@ body {
             </div>
             
                 <!-- 观后感编辑模态框（用于已看页面和频道编辑内的单条观后感快速编辑） -->
-                <div id="notesEditModal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2>编辑观后感</h2>
-                            <button class="close-btn" id="closeNotesModal">
-                                <span class="close-icon">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <label for="notesTextarea" style="display:block; margin-bottom:8px; color:var(--text-secondary);">观后感（支持换行，输入框留有足够空间）</label>
-                            <textarea id="notesTextarea" rows="12" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-family:inherit; font-size:14px; resize:vertical;"></textarea>
-                        </div>
-                        <div class="modal-footer" style="display:flex; gap:8px; justify-content:flex-end; padding:16px;">
-                            <button id="cancelNotesBtn" class="filter-btn" style="background:#f5f6f8; color:var(--text-primary);">取消</button>
-                            <button id="saveNotesBtn" class="filter-btn" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white;">保存</button>
-                        </div>
-                    </div>
-                </div>
-
             <!-- 已看视频页面 -->
             <div id="watchedVideosPage" class="page">
                 <div class="page-header">
@@ -1994,6 +3848,364 @@ body {
         </div>
     </div>
 
+    <!-- AI API 配置模态框 -->
+    <div id="apiConfigModal" class="modal" style="display: none; z-index: 10000;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>⚙️ AI API 配置</h2>
+                <button class="close-btn" id="closeApiConfig">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- AI 提供商选择 -->
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">🤖 AI 提供商：</label>
+                    <select id="aiProvider" style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: inherit; font-size: 1rem;">
+                        <option value="gemini">🎁 Google Gemini（推荐 - 完全免费）</option>
+                        <option value="groq">⚡ Groq（免费 - 超快速度）</option>
+                        <option value="openai">💰 OpenAI（付费）</option>
+                    </select>
+                </div>
+
+                <!-- Gemini 配置 -->
+                <div id="geminiConfig" class="provider-config">
+                    <div style="margin-bottom: 16px; padding: 12px; background: #d1fae5; border-radius: 8px; font-size: 0.9rem;">
+                        <p style="margin: 0 0 8px 0;"><strong>✅ 完全免费！Google Gemini API</strong></p>
+                        <p style="margin: 0; font-size: 0.85rem;">每分钟 15 次请求，每天 1500 次请求，无需信用卡</p>
+                    </div>
+                    <div style="margin-bottom: 16px; padding: 12px; background: #f0f9ff; border-radius: 8px; font-size: 0.9rem;">
+                        <p style="margin: 0 0 8px 0;"><strong>🔑 如何获取免费 API Key：</strong></p>
+                        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                            <li>访问 <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #0ea5e9;">Google AI Studio</a></li>
+                            <li>使用 Google 账号登录</li>
+                            <li>点击 "Get API Key" 或 "创建 API 密钥"</li>
+                            <li>复制 API Key 并粘贴到下方</li>
+                        </ol>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gemini API Key：</label>
+                        <input type="password" id="geminiApiKey" placeholder="AIza..." style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: monospace; font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">模型：</label>
+                        <select id="geminiModel" style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: inherit;">
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash（推荐 - 快速免费）</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro（高质量免费）</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Groq 配置 -->
+                <div id="groqConfig" class="provider-config" style="display: none;">
+                    <div style="margin-bottom: 16px; padding: 12px; background: #d1fae5; border-radius: 8px; font-size: 0.9rem;">
+                        <p style="margin: 0 0 8px 0;"><strong>✅ 完全免费！Groq 超快 AI</strong></p>
+                        <p style="margin: 0; font-size: 0.85rem;">响应速度极快，免费额度充足</p>
+                    </div>
+                    <div style="margin-bottom: 16px; padding: 12px; background: #f0f9ff; border-radius: 8px; font-size: 0.9rem;">
+                        <p style="margin: 0 0 8px 0;"><strong>🔑 如何获取免费 API Key：</strong></p>
+                        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                            <li>访问 <a href="https://console.groq.com/keys" target="_blank" style="color: #0ea5e9;">Groq Console</a></li>
+                            <li>注册账号（支持 Google 登录）</li>
+                            <li>点击 "Create API Key"</li>
+                            <li>复制 API Key 并粘贴到下方</li>
+                        </ol>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Groq API Key：</label>
+                        <input type="password" id="groqApiKey" placeholder="gsk_..." style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: monospace; font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">模型：</label>
+                        <select id="groqModel" style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: inherit;">
+                            <option value="llama-3.1-70b-versatile">Llama 3.1 70B（推荐 - 强大全能）</option>
+                            <option value="llama-3.1-8b-instant">Llama 3.1 8B（快速响应）</option>
+                            <option value="mixtral-8x7b-32768">Mixtral 8x7B（长文本）</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- OpenAI 配置 -->
+                <div id="openaiConfig" class="provider-config" style="display: none;">
+                    <div style="margin-bottom: 16px; padding: 12px; background: #fef3c7; border-radius: 8px; font-size: 0.9rem;">
+                        <p style="margin: 0 0 8px 0;"><strong>💰 OpenAI（付费服务）</strong></p>
+                        <p style="margin: 0; font-size: 0.85rem;">需要付费，但如果您已有 API Key 可以使用</p>
+                    </div>
+                    <div style="margin-bottom: 16px; padding: 12px; background: #f0f9ff; border-radius: 8px; font-size: 0.9rem;">
+                        <p style="margin: 0 0 8px 0;"><strong>🔑 如何获取 API Key：</strong></p>
+                        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                            <li>访问 <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #0ea5e9;">OpenAI API Keys</a></li>
+                            <li>登录或注册账号</li>
+                            <li>点击 "Create new secret key"</li>
+                            <li>复制 API Key 并粘贴到下方</li>
+                        </ol>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">OpenAI API Key：</label>
+                        <input type="password" id="openaiApiKey" placeholder="sk-..." style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: monospace; font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">模型：</label>
+                        <select id="openaiModel" style="width: 100%; padding: 10px; border: 1px solid #e1e8ed; border-radius: 8px; font-family: inherit;">
+                            <option value="gpt-4o">GPT-4o（推荐，最新最快）</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo（高质量）</option>
+                            <option value="gpt-4">GPT-4（经典版本）</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo（经济实惠）</option>
+                        </select>
+                    </div>
+                    <div style="padding: 12px; background: #fee2e2; border-radius: 8px; font-size: 0.85rem;">
+                        <p style="margin: 0;"><strong>⚠️ 注意：</strong>使用 OpenAI API 会产生费用，请确保账户有足够余额。GPT-4 约 $0.03/1K tokens，GPT-3.5 约 $0.002/1K tokens。</p>
+                    </div>
+                </div>
+
+                <p style="margin: 16px 0 0 0; font-size: 0.85rem; color: #64748b;">
+                    💡 API Key 只保存在浏览器本地，不会上传到任何服务器
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end; padding: 16px;">
+                <button id="clearApiKey" class="filter-btn" style="background: #fee2e2; color: #991b1b;">清除</button>
+                <button id="saveApiKey" class="filter-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 学习助手模态框 -->
+    <div id="aiAssistantModal" class="modal" style="display: none;">
+        <div class="modal-content ai-assistant-modal">
+            <div class="modal-header">
+                <h2>🤖 AI 学习助手</h2>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="settings-btn" id="openApiSettings" title="API 设置">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m0-12a9 9 0 0 1 9 9m-9-9a9 9 0 0 0-9 9m18 0a9 9 0 0 1-9 9m9-9h-6m-6 0H1m11 9a9 9 0 0 1-9-9"></path>
+                        </svg>
+                    </button>
+                    <button class="close-btn" id="closeAIAssistant">
+                        <span class="close-icon">×</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body ai-assistant-body">
+                <div class="ai-context-panel">
+                    <h4>📚 当前学习内容</h4>
+                    <div id="aiContextInfo" class="context-info">
+                        <div class="context-item">
+                            <strong>频道：</strong><span id="aiChannelName">-</span>
+                        </div>
+                        <div class="context-item">
+                            <strong>视频：</strong><span id="aiVideoTitle">-</span>
+                        </div>
+                        <div class="context-item">
+                            <strong>你的观后感：</strong><span id="aiUserNotes">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-extract-panel">
+                    <h4>🎬 智能视频分析</h4>
+                    <div class="extract-input-container">
+                        <input type="url" id="youtubeUrlInput" placeholder="粘贴 YouTube 视频链接，AI 将自动提取内容并生成笔记..." />
+                        <button id="extractVideoBtn" class="extract-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            提取内容
+                        </button>
+                    </div>
+                    <div id="extractStatus" class="extract-status" style="display: none;">
+                        <span class="status-dot"></span>
+                        <span class="status-message">正在提取视频内容...</span>
+                    </div>
+                    <div id="videoTranscript" class="video-transcript" style="display: none;">
+                        <h5>📝 视频内容摘要</h5>
+                        <div id="transcriptContent"></div>
+                    </div>
+                </div>
+                
+                <div class="ai-suggestions-panel">
+                    <h4>💡 智能问题建议</h4>
+                    <div class="suggestion-categories">
+                        <div class="category-tabs">
+                            <button class="category-tab active" data-category="knowledge">📚 知识学习</button>
+                            <button class="category-tab" data-category="life">🌱 生活成长</button>
+                            <button class="category-tab" data-category="thinking">🧠 深度思考</button>
+                            <button class="category-tab" data-category="english">🇺🇸 英语学习</button>
+                        </div>
+                        
+                        <div class="suggestion-content">
+                            <!-- 知识学习类问题 -->
+                            <div class="suggestion-group active" data-category="knowledge">
+                                <div class="group-title">基于布鲁姆分类法 & 费曼学习法</div>
+                                <div class="suggestion-buttons">
+                                    <button class="suggestion-btn" data-question="这个视频的核心观点是什么？用简单的话解释给我听">核心观点（理解）</button>
+                                    <button class="suggestion-btn" data-question="如何将视频中的知识应用到我的实际生活和学习中？">实践应用（应用）</button>
+                                    <button class="suggestion-btn" data-question="分析这个视频与其他学习内容的联系，构建知识网络">知识关联（分析）</button>
+                                    <button class="suggestion-btn" data-question="基于这个视频，制定一个具体的学习计划和行动步骤">学习计划（综合）</button>
+                                    <button class="suggestion-btn" data-question="推荐更多相关的学习资源和进阶内容">拓展资源（评价）</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 生活成长类问题 -->
+                            <div class="suggestion-group" data-category="life">
+                                <div class="group-title">基于积极心理学 & 成长型思维</div>
+                                <div class="suggestion-buttons">
+                                    <button class="suggestion-btn" data-question="这个视频给我的生活态度带来了什么启发？">心态启发</button>
+                                    <button class="suggestion-btn" data-question="我如何将视频中的价值观融入我的日常生活中？">价值观实践</button>
+                                    <button class="suggestion-btn" data-question="这个视频如何帮助我做出更好的决策？">决策优化</button>
+                                    <button class="suggestion-btn" data-question="视频中提到的哪些方法可以改善我的情感状态？">情感管理</button>
+                                    <button class="suggestion-btn" data-question="基于这个视频，我可以设定哪些个人成长目标？">成长目标</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 深度思考类问题 -->
+                            <div class="suggestion-group" data-category="thinking">
+                                <div class="group-title">基于苏格拉底式提问 & 批判性思维</div>
+                                <div class="suggestion-buttons">
+                                    <button class="suggestion-btn" data-question="我对视频中的观点有什么不同的看法？为什么？">批判思考</button>
+                                    <button class="suggestion-btn" data-question="这个视频让我重新思考了什么人生问题？">反思启发</button>
+                                    <button class="suggestion-btn" data-question="如果我要向朋友推荐这个视频，我会怎么说？">内化表达</button>
+                                    <button class="suggestion-btn" data-question="视频中的观点与我之前的认知有什么冲突？如何调和？">认知整合</button>
+                                    <button class="suggestion-btn" data-question="基于这个视频，我想进一步探索哪些相关的哲学或心理学问题？">深度探索</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 英语学习类问题 -->
+                            <div class="suggestion-group" data-category="english">
+                                <div class="group-title">基于二语习得理论 & 交际教学法</div>
+                                <div class="suggestion-buttons">
+                                    <button class="suggestion-btn" data-question="这个视频中出现了哪些值得学习的英语词汇？请解释其用法和搭配">词汇学习</button>
+                                    <button class="suggestion-btn" data-question="视频中的语法结构有什么特点？能给我举一些类似的例句吗？">语法分析</button>
+                                    <button class="suggestion-btn" data-question="视频中使用了哪些地道的英语表达？如何在实际对话中运用？">地道表达</button>
+                                    <button class="suggestion-btn" data-question="请帮我总结视频中的句式模式，并教我如何模仿造句">句式模仿</button>
+                                    <button class="suggestion-btn" data-question="基于这个视频，给我设计一些英语口语练习和写作练习">语言练习</button>
+                                    <button class="suggestion-btn" data-question="视频中的发音、语调有什么特点？如何提高我的英语发音？">发音指导</button>
+                                    <button class="suggestion-btn english-analysis-btn" data-question="请全面分析这个视频的英语学习价值，包括词汇、语法、表达和发音等方面">全面英语分析</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-chat-container">
+                    <div class="chat-messages" id="aiChatMessages">
+                        <div class="ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>你好！我是你的 AI 学习助手。</p>
+                                <p><strong>智能功能：</strong></p>
+                                <ul style="margin: 8px 0; padding-left: 20px;">
+                                    <li>📝 自动提取 YouTube 视频内容和字幕</li>
+                                    <li>🤖 基于视频内容生成学习笔记（使用 GPT-4）</li>
+                                    <li>💬 智能问答，帮助你深度理解内容</li>
+                                    <li>📊 提供个性化学习建议</li>
+                                    <li>🇺🇸 <strong>英语学习分析</strong>：词汇、语法、表达、发音</li>
+                                </ul>
+                                <p style="margin-top: 12px;">点击"提取内容"按钮开始分析视频，或直接问我问题！</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <!-- 快速建议按钮 -->
+                        <div class="quick-suggestions" id="quickSuggestions" style="display: none;">
+                            <div class="quick-suggestions-header">
+                                <span class="quick-suggestions-title">💡 快速建议</span>
+                                <button class="toggle-suggestions-btn" onclick="toggleQuickSuggestions()" title="收起建议">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="quick-suggestions-content">
+                                <button class="quick-suggestion-btn" onclick="insertSuggestion('这个视频的核心观点是什么？用简单的话解释给我听')">核心观点</button>
+                                <button class="quick-suggestion-btn" onclick="insertSuggestion('如何将视频中的知识应用到我的实际生活和学习中？')">实践应用</button>
+                                <button class="quick-suggestion-btn" onclick="insertSuggestion('这个视频给我的生活态度带来了什么启发？')">心态启发</button>
+                                <button class="quick-suggestion-btn" onclick="insertSuggestion('我对视频中的观点有什么不同的看法？为什么？')">批判思考</button>
+                                <button class="quick-suggestion-btn" onclick="insertSuggestion('这个视频中出现了哪些值得学习的英语词汇？请解释其用法和搭配')">词汇学习</button>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <textarea id="aiChatInput" placeholder="问我关于这个视频的任何问题..." rows="2"></textarea>
+                            <div class="chat-input-actions">
+                                <button class="show-suggestions-btn" onclick="toggleQuickSuggestions()" title="显示建议">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                    </svg>
+                                </button>
+                                <button id="sendAIMessage" class="send-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="ai-status" id="aiStatus">
+                            <span class="status-indicator">●</span>
+                            <span class="status-text">AI 助手就绪</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 浮动建议按钮 -->
+                    <div class="floating-suggestions-btn" id="floatingSuggestionsBtn" onclick="scrollToSuggestions()" title="查看所有建议">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <span>建议</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学习报告页面 -->
+    <div id="learningReportPage" class="page" style="display: none;">
+        <div class="page-header">
+            <h2>📊 学习报告</h2>
+            <div class="report-controls">
+                <button class="filter-btn" id="generateReportBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    生成报告
+                </button>
+                <button class="filter-btn" id="exportReportBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    导出报告
+                </button>
+            </div>
+        </div>
+        <div class="report-content" id="reportContent">
+            <div class="report-placeholder">
+                <div class="placeholder-icon">📊</div>
+                <h3>学习报告</h3>
+                <p>点击"生成报告"按钮，AI 将分析你的观看历史并生成个人学习报告</p>
+                <ul>
+                    <li>📈 学习进度统计</li>
+                    <li>🗺️ 知识地图可视化</li>
+                    <li>🎯 技能聚合分析</li>
+                    <li>📚 学习建议和规划</li>
+                    <li>🇺🇸 英语学习追踪</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- 已看视频页面 -->
     <div id="watchedVideosPage" class="page" style="display: none;">
         <div class="page-header">
@@ -2083,13 +4295,7 @@ const channelsData = [
                 link: "https://www.youtube.com/@PaigeY",
                 rating: 4
             },
-            {
-                name: "Nicole Laeno",
-                region: "美国",
-                description: "高中生学习生活代表。内容包括学校vlog、考试准备、舞蹈日常与朋友互动。语言自然真实，是沉浸式英语听力的理想素材。",
-                link: "https://www.youtube.com/@nicolelaeno",
-                rating: 4
-            }
+            
         ]
     },
     {
@@ -2103,13 +4309,7 @@ const channelsData = [
                 link: "https://www.youtube.com/@UnJadedJade",
                 rating: 5
             },
-            {
-                name: "Jedcal",
-                region: "美国",
-                description: "范德堡大学毕业，现居洛杉矶。以大学生活、健身与自我成长为主线，风格清爽自然。他的视频节奏舒缓、口音清晰，是沉浸式听力与生活灵感的完美结合。推荐主题：《A Day in My Life at Vanderbilt》《My Morning Routine for Productivity》。",
-                link: "https://www.youtube.com/@jedcal",
-                rating: 4
-            },
+            
             {
                 name: "Thomas Frank",
                 region: "美国",
@@ -2124,20 +4324,8 @@ const channelsData = [
                 link: "https://www.youtube.com/@TiagoForte",
                 rating: 5
             },
-            {
-                name: "Breanna Quan",
-                region: "加拿大",
-                description: "医学生 + 高效率学习博主。以24小时学习挑战、时间管理vlog等视频走红。她用可视化方式呈现学习过程，让人真正理解如何执行计划。视频节奏轻快、能量满满，看完立刻想打开笔记本学习。",
-                link: "https://www.youtube.com/@breannaquan",
-                rating: 5
-            },
-            {
-                name: "Mmiakim",
-                region: "韩国",
-                description: "韩裔神经科学专业学霸。视频节奏平静，画面干净整洁，专注学习与思考的真实状态。她代表了一种慢而稳的自律，极适合喜欢沉浸学习氛围的观众。",
-                link: "https://www.youtube.com/@mmiakim",
-                rating: 5
-            },
+            
+            
             {
                 name: "Hanna Vanharanta",
                 region: "香港/芬兰",
@@ -2159,13 +4347,7 @@ const channelsData = [
                 link: "https://www.youtube.com/@KharmaMedic",
                 rating: 5
             },
-            {
-                name: "Jasmine Le",
-                region: "美国",
-                description: "在美留学生，风格温柔真诚。内容涵盖校园、时尚与生活感悟。她的视频节奏温和，常带有轻音乐与日记口吻，适合放松学习之余观看。",
-                link: "https://www.youtube.com/@jasminele",
-                rating: 4
-            }
+            
         ]
     },
     {
@@ -2239,7 +4421,7 @@ const channelsData = [
     
     // Part 2: 文化碰撞
     {
-        category: "北美亚裔生活",
+    category: "亚裔生活",
         starred: false,
         channels: [
             {
@@ -2300,11 +4482,48 @@ const channelsData = [
             },
             {
                 name: "Jusuf",
-                region: "瑞士/菲律宾",
+                region: "瑞士/菲律宾裔",
                 description: "温柔沉静的学习博主，画面审美极高。Gap 3 年后重返校园，以淡然叙述展现自律与生命韧性。",
                 link: "https://www.youtube.com/@Jusufreinhard",
                 rating: 5
             }
+            ,
+            {
+                name: "Caitlin Lam",
+                region: "纽约/亚裔",
+                description: "纽约艺术与生活方式创作者，分享搬到纽约、哈佛日常、艺术创作记录等。风格温柔干净，是文艺青年学习vlog的代表。",
+                link: "https://www.youtube.com/%40caitshouse?utm_source=chatgpt.com",
+                rating: 5
+            },
+            {
+                name: "Nicole Laeno",
+                region: "加州/菲律宾-越南裔",
+                description: "高中生学习生活代表。内容包括学校vlog、考试准备、舞蹈日常与朋友互动。语言自然真实，是沉浸式英语听力的理想素材。",
+                link: "https://www.youtube.com/@nicolelaeno",
+                rating: 4
+            },
+            {
+                name: "Mmiakim",
+                region: "北美/韩裔",
+                description: "韩裔神经科学专业学霸。视频节奏平静，画面干净整洁，专注学习与思考的真实状态。她代表了一种慢而稳的自律，极适合喜欢沉浸学习氛围的观众。",
+                link: "https://www.youtube.com/@mmiakim",
+                rating: 5
+            },
+            {
+                name: "Jedcal",
+                region: "洛杉矶/亚裔",
+                description: "范德堡大学毕业，现居洛杉矶。以大学生活、健身与自我成长为主线，风格清爽自然。他的视频节奏舒缓、口音清晰，是沉浸式听力与生活灵感的完美结合。推荐主题：《A Day in My Life at Vanderbilt》《My Morning Routine for Productivity》。",
+                link: "https://www.youtube.com/@jedcal",
+                rating: 4
+            },
+            {
+                name: "Jasmine Le",
+                region: "加州/越南裔",
+                description: "在美留学生，风格温柔真诚。内容涵盖校园、时尚與生活感悟。她的视频节奏温和，常带有轻音乐与日记口吻，适合放松学习之余觀看。",
+                link: "https://www.youtube.com/@jasminele",
+                rating: 4
+            }
+            
         ]
     },
     {
@@ -2313,7 +4532,7 @@ const channelsData = [
         channels: [
             {
                 name: "Fred Liu",
-                region: "美国/华裔",
+                region: "中国/西雅图",
                 description: "来自西雅图，目前就读于 西北大学（Northwestern University）。以 大学生活 vlog、幽默短剧、Q&A 为主，内容自然真实、节奏明快。吐字清晰，发音标准，语气轻松幽默，是提升英语听力与口语表达的绝佳素材。以独特的温柔理性 + 轻喜剧式剪辑风格走红，深受北美留学生与Z世代观众喜爱。",
                 link: "https://www.youtube.com/%40Freddielooo?utm_source=chatgpt.com",
                 rating: 4
@@ -2327,7 +4546,7 @@ const channelsData = [
             },
             {
                 name: "Breanna Quan",
-                region: "华裔加拿大",
+                region: "中国/加拿大",
                 description: "学习型vlogger，逻辑清晰、表达自然。通过talk形式探讨成长与自律。",
                 link: "https://www.youtube.com/@breannaquan",
                 rating: 5
@@ -2356,14 +4575,14 @@ const channelsData = [
             {
                 name: "ReginaKnowsss",
                 region: "中国/加拿大",
-                description: "多伦多华人博主，Oh Emma 的好友，两人常合作拍摄 vlog 或互相关注互动。她的视频内容以生活记录、穿搭分享、独居女性的成长心境为主。表达细腻、语气温柔、充满故事感，像是在深夜与你推心置腹地聊天。她分享成熟女性的理性、温柔与独立，是北美华人圈中极具气质的代表。",
+                description: "多伦多华人博主，Oh Emma 的好友，两人常合作拍摄 vlog 或互相關注互動。她的视频内容以生活记录、穿搭分享、独居女性的成长心境为主。表达细腻、语气温柔、充满故事感，像是在深夜与你推心置腹地聊天。她分享成熟女性的理性、温柔与独立，是北美华人圈中極具气质的代表。",
                 link: "https://www.youtube.com/@reginaknows9443",
                 rating: 5
             },
             {
                 name: "Savislook",
                 region: "中国",
-                description: "北美时期成名的时尚博主，现已回国发展。穿搭与家居审美极高，近期怀上双胞胎。",
+                description: "北美时期成名的時尚博主，現已回國發展。穿搭與家居審美極高，近期懷上雙胞胎。",
                 link: "https://www.youtube.com/@savislook",
                 rating: 5
             },
@@ -2377,14 +4596,14 @@ const channelsData = [
             {
                 name: "Hola! Fiona",
                 region: "中国/德国",
-                description: "来自上海，现居德国的生活方式博主，以温柔语气与真实日常打动观众。从留学到结婚、生子，她的视频记录了自己在德国的生活点滴——学德语、做饭、旅行、带娃。她与丈夫钢铁侠感情稳定，互动自然，是温柔而独立的代表。内容轻松治愈，节奏舒缓，展现了异国生活中认真生活的小确幸。",
+                description: "来自上海，现居德国的生活方式博主，以温柔语气与真实日常打动观众。从留学到结婚、生子，她的视频记录了自己在德国的生活点滴——学德语、做饭、旅行、带娃。她与丈夫鋼鐵侠感情穩定，互動自然，是溫柔而獨立的代表。內容輕鬆治愈，節奏舒缓，展現了異國生活中認真的小確幸。",
                 link: "https://www.youtube.com/@holafiona5882",
                 rating: 5
             },
             {
                 name: "Rainie Tian",
-                region: "加拿大",
-                description: "早期起号的美妆vlogger，性格阳光开朗。婚后依然坚持更新，分享生活点滴。",
+                region: "中国/加拿大",
+                description: "早期起号的美妆vlogger，性格陽光開朗。婚后依然坚持更新，分享生活點滴。",
                 link: "https://www.youtube.com/@rainietian",
                 rating: 5
             },
@@ -2398,7 +4617,7 @@ const channelsData = [
             {
                 name: "Meng Mao",
                 region: "中国/法国",
-                description: "四川女孩旅法时尚博主，常出入欧洲时尚圈。擅长混搭设计师品牌，时尚品味极高。",
+                description: "四川女孩旅法時尚博主，常出入欧洲時尚圈。擅長混搭設計師品牌，時尚品味極高。",
                 link: "https://www.youtube.com/results?search_query=Meng+Mao",
                 rating: 5
             },
@@ -2460,7 +4679,7 @@ const channelsData = [
             },
             {
                 name: "Nuria Ma",
-                region: "西班牙/华裔",
+                region: "中国/伦敦",
                 description: "现居伦敦大学生，以时尚与日常 vlog 闻名。代表作：《Shopping Alone in London》《Attending the British Fashion Awards》。",
                 link: "https://www.youtube.com/%40Nuriamaa?utm_source=chatgpt.com",
                 rating: 5
@@ -2686,13 +4905,7 @@ const channelsData = [
                 link: "https://www.youtube.com/%40katebrock_?utm_source=chatgpt.com",
                 rating: 5
             },
-            {
-                name: "Caitlin Lam",
-                region: "美国",
-                description: "纽约艺术与生活方式创作者，分享搬到纽约、哈佛日常、艺术创作记录等。风格温柔干净，是文艺青年学习vlog的代表。",
-                link: "https://www.youtube.com/%40caitshouse?utm_source=chatgpt.com",
-                rating: 5
-            },
+            // Caitlin Lam 已移至 亚裔生活
             {
                 name: "Kaiti Yoo",
                 region: "美国",
@@ -3345,7 +5558,7 @@ const channelsData = [
         "Veronika's Language Diaries", 'English Fluency Journey', 'Speak English With Tiffany', 'Chen Lily',
         // 职场成长
         'Lillian Chiu', 'Matt Huang', 'Leila Hormozi',
-        // 北美亚裔生活
+    // 亚裔生活
         'Yoora Jung', 'Saranghoe', 'Tracy', 'Michelle Choi', 'Yoon Kai', 'Mikayla Mags', 'Jusuf',
         // 海外华人生活
         'Breanna Quan', 'itsyuyan', 'Oh Emma', 'ReginaKnowsss', 'Savislook', 'VickySoupsss', 'Hola! Fiona', 'Rainie Tian', 'Miwivon', 'Meng Mao', 'Krysti Naaa', 'Annbition', 'Renasteps', 'Hilary Chen', 'Della Qin', 'Anny Shi', '胖丁 Wenning', 'Phiphiwearswhat', 'Nuria Ma',
@@ -3389,9 +5602,10 @@ const channelsData = [
 })();
 
 // 收藏夹功能
-let favorites = JSON.parse(localStorage.getItem('youtubeFavorites') || '[]');
+// 全局变量 - 不在这里从localStorage加载，统一在loadAllData()中加载
+let favorites = [];
 let currentView = 'all'; // 'all' 或 'favorites' 或 'watched'
-let watchedVideos = JSON.parse(localStorage.getItem('watchedVideos') || '{}'); // 存储格式：{channelName: [{url, title, notes, date}]}
+let watchedVideos = {}; // 存储格式：{channelName: [{url, title, notes, date}]}
 let currentEditingChannel = null;
 // 当前正在通过模态编辑的上下文（用于观后感编辑）
 let notesEditingContext = null;
@@ -3417,7 +5631,8 @@ function switchPage(pageId) {
     const activeBtnMap = {
         'allChannelsPage': 'allChannelsBtn',
         'favoritesPage': 'favoritesBtn',
-        'watchedVideosPage': 'watchedVideosBtn'
+        'watchedVideosPage': 'watchedVideosBtn',
+        'learningReportPage': 'learningReportBtn'
     };
     
     if (activeBtnMap[pageId]) {
@@ -3450,13 +5665,16 @@ function renderChannels(data, searchTerm = '') {
 
     let hasResults = false;
 
+    // 规范化搜索词，防止传入非字符串或含前后空白导致匹配失败
+    searchTerm = (searchTerm || '').toString().trim();
+
     data.forEach(categoryData => {
         const filteredChannels = categoryData.channels.filter(channel => {
             if (!searchTerm) return true;
             const term = searchTerm.toLowerCase();
-            return channel.name.toLowerCase().includes(term) ||
-                   channel.description.toLowerCase().includes(term) ||
-                   channel.region.toLowerCase().includes(term);
+            return (channel.name || '').toLowerCase().includes(term) ||
+                   ((channel.description || '').toLowerCase().includes(term)) ||
+                   ((channel.region || '').toLowerCase().includes(term));
         });
 
         if (filteredChannels.length > 0) {
@@ -3747,15 +5965,55 @@ function renderWatchedVideosPage() {
             </div>
             <div class="channel-group-content">
                 ${videos.map(video => `
-                    <div class="watched-video-item">
-                        <div class="watched-video-content">
+                    <div class="watched-video-item" data-url="${video.url}">
+                        <div class="watched-video-header">
                             <div class="watched-video-title">${video.title || '无标题'}</div>
+                            <button class="collapse-toggle-btn" data-url="${video.url}" title="折叠/展开详细信息">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="watched-video-content" data-url="${video.url}">
                             <a href="${video.url}" target="_blank" class="watched-video-url">${video.url}</a>
                             <div class="watched-video-notes">${video.notes || '暂无观后感'}</div>
+                            ${video.aiNotes ? `<div class="ai-notes-display">${video.aiNotes}</div>` : ''}
                         </div>
                         <div class="watched-video-actions">
-                            <button class="edit-watched-notes-btn" data-channel="${channelName}" data-url="${video.url}">编辑</button>
-                            <button class="delete-watched-video-btn" data-channel="${channelName}" data-url="${video.url}">删除</button>
+                            <button class="ai-assistant-btn" data-channel="${channelName}" data-url="${video.url}" data-title="${video.title || ''}" data-notes="${video.notes || ''}" title="AI 学习助手">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    <path d="M13 8H7"></path>
+                                    <path d="M17 12H7"></path>
+                                </svg>
+                                AI 助手
+                            </button>
+                            ${!video.aiNotesGenerated ? `
+                            <button class="generate-ai-notes-btn" data-channel="${channelName}" data-url="${video.url}" title="生成 AI 学习笔记">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10,9 9,9 8,9"></polyline>
+                                </svg>
+                                生成笔记
+                            </button>
+                            ` : ''}
+                            <button class="edit-watched-notes-btn" data-channel="${channelName}" data-url="${video.url}" data-title="${video.title || ''}" data-notes="${video.notes || ''}" title="编辑视频信息">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                编辑
+                            </button>
+                            <button class="delete-watched-video-btn" data-channel="${channelName}" data-url="${video.url}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3,6 5,6 21,6"></polyline>
+                                    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                                </svg>
+                                删除
+                            </button>
                         </div>
                     </div>
                 `).join('')}
@@ -3850,11 +6108,18 @@ function renderWatchedVideosList() {
     
     container.innerHTML = videos.map(video => `
         <div class="video-item" data-url="${video.url}">
-            <div class="video-content">
+            <div class="video-header">
                 <div class="video-title-container">
                     <div class="video-title-display">${video.title || '无标题'}</div>
                     <input type="text" class="video-title-edit" data-channel="${currentEditingChannel}" data-url="${video.url}" placeholder="视频标题（可选）" style="display: none;" value="${video.title || ''}">
                 </div>
+                <button class="collapse-toggle-btn" data-url="${video.url}" title="折叠/展开详细信息">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="video-content" data-url="${video.url}">
                 <div class="video-url-container">
                     <a href="${video.url}" target="_blank" class="video-url-display">${video.url}</a>
                     <input type="url" class="video-url-edit" data-channel="${currentEditingChannel}" data-url="${video.url}" placeholder="输入视频链接..." style="display: none;" value="${video.url}">
@@ -3864,8 +6129,41 @@ function renderWatchedVideosList() {
                     <div class="video-notes-display">${video.notes || '暂无观后感'}</div>
                     <textarea class="video-notes-edit" data-channel="${currentEditingChannel}" data-url="${video.url}" placeholder="添加观后感（可选）..." style="display: none;">${video.notes || ''}</textarea>
                 </div>
+                ${video.aiNotes ? `
+                <div class="ai-notes-container">
+                    <label class="ai-notes-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            <path d="M13 8H7"></path>
+                            <path d="M17 12H7"></path>
+                        </svg>
+                        AI 学习笔记：
+                    </label>
+                    <div class="ai-notes-display">${video.aiNotes}</div>
+                </div>
+                ` : ''}
             </div>
             <div class="video-actions">
+                <button class="ai-assistant-btn" data-channel="${currentEditingChannel}" data-url="${video.url}" data-title="${video.title || ''}" data-notes="${video.notes || ''}" title="AI 学习助手">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        <path d="M13 8H7"></path>
+                        <path d="M17 12H7"></path>
+                    </svg>
+                    AI 助手
+                </button>
+                ${!video.aiNotesGenerated ? `
+                <button class="generate-ai-notes-btn" data-channel="${currentEditingChannel}" data-url="${video.url}" title="生成 AI 学习笔记">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                    生成笔记
+                </button>
+                ` : ''}
                 <button class="edit-save-btn" data-channel="${currentEditingChannel}" data-url="${video.url}" data-editing="false">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -3886,7 +6184,8 @@ function renderWatchedVideosList() {
 }
 
 // 添加视频
-function addVideo() {
+async function addVideo() {
+    console.log('🔵 开始添加视频...');
     const urlInput = document.getElementById('videoUrlInput');
     const titleInput = document.getElementById('videoTitleInput');
     const notesInput = document.getElementById('videoNotesInput');
@@ -3895,6 +6194,8 @@ function addVideo() {
     const title = titleInput.value.trim();
     const notes = notesInput.value.trim();
     
+    console.log('📝 输入的视频信息:', { url, title, notes, currentEditingChannel });
+    
     if (!url) {
         alert('请输入视频链接');
         return;
@@ -3902,11 +6203,13 @@ function addVideo() {
     
     if (!currentEditingChannel) {
         alert('请先选择频道');
+        console.error('❌ currentEditingChannel 为空');
         return;
     }
     
     if (!watchedVideos[currentEditingChannel]) {
         watchedVideos[currentEditingChannel] = [];
+        console.log(`📁 为频道 "${currentEditingChannel}" 创建新的视频数组`);
     }
     
     // 检查是否已存在
@@ -3916,14 +6219,52 @@ function addVideo() {
         return;
     }
     
-    watchedVideos[currentEditingChannel].push({
+    // 创建视频对象
+    const videoData = {
         url: url,
         title: title,
         notes: notes,
-        date: new Date().toISOString()
-    });
+        date: new Date().toISOString(),
+        aiNotes: null, // 初始化为 null
+        aiNotesGenerated: false // 标记是否已生成 AI 笔记
+    };
     
-    localStorage.setItem('watchedVideos', JSON.stringify(watchedVideos));
+    console.log('📦 创建的视频对象:', videoData);
+    
+    // 显示 AI 笔记生成状态
+    showAINotesGenerationStatus();
+    
+    // 尝试自动生成 AI 笔记
+    try {
+        const aiNotes = await generateVideoAINotes(videoData);
+        if (aiNotes) {
+            videoData.aiNotes = aiNotes;
+            videoData.aiNotesGenerated = true;
+            showAINotesGeneratedNotification();
+        }
+    } catch (error) {
+        console.error('AI 笔记生成失败:', error);
+        // 即使 AI 笔记生成失败，仍然保存视频
+    }
+    
+    watchedVideos[currentEditingChannel].push(videoData);
+    console.log(`📂 视频已添加到数组，当前频道有 ${watchedVideos[currentEditingChannel].length} 个视频`);
+    console.log('💾 当前 watchedVideos 对象:', JSON.stringify(watchedVideos, null, 2));
+    
+    // 立即保存所有数据到localStorage
+    console.log('💾 调用 saveAllData()...');
+    saveAllData();
+    
+    // 验证保存
+    const savedData = localStorage.getItem('youtubeChannelsData');
+    const savedWatchedVideos = localStorage.getItem('watchedVideos');
+    console.log('✅ localStorage 中的数据:');
+    console.log('  - youtubeChannelsData:', savedData ? '存在' : '不存在');
+    console.log('  - watchedVideos:', savedWatchedVideos ? '存在' : '不存在');
+    if (savedWatchedVideos) {
+        const parsedWatchedVideos = JSON.parse(savedWatchedVideos);
+        console.log('  - 解析后的 watchedVideos:', parsedWatchedVideos);
+    }
     
     urlInput.value = '';
     titleInput.value = '';
@@ -3933,6 +6274,10 @@ function addVideo() {
     
     // 更新频道卡片中的已看视频数量
     updateChannelCards();
+    
+    console.log(`✅ 视频 "${title || '无标题'}" 已添加到频道 "${currentEditingChannel}" 并保存到浏览器`);
+    
+    alert(`✅ 视频已成功添加！\n\n标题: ${title || '无标题'}\n链接: ${url}\n\n请刷新页面查看数据是否保存成功。`);
 }
 
 // 更新频道卡片
@@ -3954,13 +6299,17 @@ function deleteVideo(channelName, url) {
             if (watchedVideos[channelName].length === 0) {
                 delete watchedVideos[channelName];
             }
-            localStorage.setItem('watchedVideos', JSON.stringify(watchedVideos));
+            
+            // 立即保存所有数据到localStorage
+            saveAllData();
             
             if (currentEditingChannel === channelName) {
                 renderWatchedVideosList();
             }
             updateWatchedCount();
             updateChannelCards();
+            
+            console.log(`✅ 视频已从频道 "${channelName}" 删除并保存到浏览器`);
         }
     }
 }
@@ -4021,7 +6370,7 @@ function findChannelByName(name) {
 
 // 搜索功能
 document.getElementById('searchInput').addEventListener('input', (e) => {
-    const searchTerm = e.target.value;
+    const searchTerm = (e.target.value || '').toString().trim();
     const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category;
 
     let dataToSearch = channelsData;
@@ -4085,18 +6434,6 @@ document.addEventListener('click', (e) => {
         deleteVideo(channelName, url);
     }
     
-    // 编辑已看视频页面中的观后感（打开模态）
-    if (e.target.classList.contains('edit-watched-notes-btn')) {
-        const channelName = e.target.dataset.channel;
-        const url = e.target.dataset.url;
-        const video = (watchedVideos[channelName] || []).find(v => v.url === url) || {};
-        // 设置上下文
-        notesEditingContext = { channelName, url };
-        // 填充模态内容并显示
-        document.getElementById('notesTextarea').value = video.notes || '';
-        document.getElementById('notesEditModal').style.display = 'block';
-    }
-    
     // 删除已看视频页面中的视频
     if (e.target.classList.contains('delete-watched-video-btn')) {
         const channelName = e.target.dataset.channel;
@@ -4115,64 +6452,19 @@ document.getElementById('channelEditModal').addEventListener('click', (e) => {
     }
 });
 
-// 观后感模态 - 关闭 / 保存 逻辑
-document.getElementById('closeNotesModal').addEventListener('click', () => {
-    document.getElementById('notesEditModal').style.display = 'none';
-    notesEditingContext = null;
-});
-document.getElementById('cancelNotesBtn').addEventListener('click', () => {
-    document.getElementById('notesEditModal').style.display = 'none';
-    notesEditingContext = null;
-});
-document.getElementById('saveNotesBtn').addEventListener('click', () => {
-    if (!notesEditingContext) return;
-    const btn = document.getElementById('saveNotesBtn');
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '保存中...';
-
-    const notes = document.getElementById('notesTextarea').value;
-    // 模拟短暂的保存过程以展示加载状态（实际保存为同步写入localStorage）
-    setTimeout(() => {
-        updateVideoNotes(notesEditingContext.channelName, notesEditingContext.url, notes);
-        btn.textContent = '已保存 ✓';
-
-        setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = originalText;
-            document.getElementById('notesEditModal').style.display = 'none';
-            // 重新渲染当前页面
-            if (currentView === 'watched') {
-                renderWatchedVideosPage();
-            } else if (currentView === 'favorites') {
-                showFavorites();
-            } else {
-                renderChannels(channelsData);
-            }
-            notesEditingContext = null;
-        }, 700);
-    }, 300);
-});
-
-// 点击模态外部区域时关闭 notesEditModal
-document.getElementById('notesEditModal').addEventListener('click', (e) => {
-    if (e.target.id === 'notesEditModal') {
-        document.getElementById('notesEditModal').style.display = 'none';
-        notesEditingContext = null;
-    }
-});
 
 // 视频编辑模态事件
 document.getElementById('closeVideoModal').addEventListener('click', () => {
     document.getElementById('videoEditModal').style.display = 'none';
     videoEditContext = null;
+    window.currentEditingVideo = null;
 });
 document.getElementById('cancelVideoBtn').addEventListener('click', () => {
     document.getElementById('videoEditModal').style.display = 'none';
     videoEditContext = null;
+    window.currentEditingVideo = null;
 });
 document.getElementById('saveVideoBtn').addEventListener('click', () => {
-    if (!videoEditContext) return;
     const btn = document.getElementById('saveVideoBtn');
     const originalText = btn.textContent;
     btn.disabled = true;
@@ -4190,7 +6482,16 @@ document.getElementById('saveVideoBtn').addEventListener('click', () => {
     }
 
     setTimeout(() => {
-        updateVideoData(videoEditContext.channelName, videoEditContext.oldUrl, newTitle, newUrl, newNotes);
+        // 检查是从频道编辑页面还是已看视频页面来的编辑
+        if (videoEditContext) {
+            // 频道编辑页面的编辑
+            updateVideoData(videoEditContext.channelName, videoEditContext.oldUrl, newTitle, newUrl, newNotes);
+        } else if (window.currentEditingVideo) {
+            // 已看视频页面的编辑
+            const editingVideo = window.currentEditingVideo;
+            updateVideoData(editingVideo.channelName, editingVideo.originalUrl, newTitle, newUrl, newNotes);
+        }
+        
         btn.textContent = '已保存 ✓';
 
         setTimeout(() => {
@@ -4198,6 +6499,7 @@ document.getElementById('saveVideoBtn').addEventListener('click', () => {
             btn.textContent = originalText;
             document.getElementById('videoEditModal').style.display = 'none';
             videoEditContext = null;
+            window.currentEditingVideo = null;
 
             // 重新渲染当前视图
             if (currentView === 'watched') {
@@ -4216,48 +6518,146 @@ document.getElementById('videoEditModal').addEventListener('click', (e) => {
     if (e.target.id === 'videoEditModal') {
         document.getElementById('videoEditModal').style.display = 'none';
         videoEditContext = null;
+        window.currentEditingVideo = null;
     }
 });
 
-// 初始化
+// 主初始化 - 整合所有初始化逻辑
 document.addEventListener('DOMContentLoaded', () => {
+    // 第一步：加载所有保存的数据
     loadAllData();
+    
+    // 第二步：初始化UI
     createFilterButtons();
     updateFavoritesCount();
     updateWatchedCount();
     
-    // 设置默认状态
+    // 第三步：清理可能残留的 AI 笔记生成状态
+    clearAINotesGenerationStatus();
+    
+    // 第四步：设置键盘快捷键
+    setupKeyboardShortcuts();
+    
+    // 第五步：设置默认状态
     showAllChannels();
     
-    // 添加导航按键事件监听器
+    // 第六步：添加导航按键事件监听器
     document.getElementById('favoritesBtn').addEventListener('click', showFavorites);
     document.getElementById('allChannelsBtn').addEventListener('click', showAllChannels);
     document.getElementById('watchedVideosBtn').addEventListener('click', showWatchedVideos);
     
-    // 添加数据管理按键事件监听器
+    // 第七步：添加数据管理按键事件监听器
     document.getElementById('exportBtn').addEventListener('click', exportData);
     document.getElementById('importBtn').addEventListener('click', importData);
     document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+    
+    // 第八步：添加学习报告按钮事件监听器
+    const learningReportBtn = document.getElementById('learningReportBtn');
+    if (learningReportBtn) {
+        learningReportBtn.addEventListener('click', () => switchPage('learningReportPage'));
+    }
+    
+    const generateReportBtn = document.getElementById('generateReportBtn');
+    if (generateReportBtn) {
+        generateReportBtn.addEventListener('click', generateLearningReport);
+    }
+    
+    const exportReportBtn = document.getElementById('exportReportBtn');
+    if (exportReportBtn) {
+        exportReportBtn.addEventListener('click', exportLearningReport);
+    }
+    
+    console.log('✅ 应用初始化完成');
 });
 
 // 数据管理功能
+// 完善的数据保存函数 - 确保所有数据实时保存
 function saveAllData() {
-    const data = {
-        favorites: favorites,
-        watchedVideos: watchedVideos,
-        ratings: getRatings(),
-        timestamp: new Date().toISOString(),
-        version: '1.0'
+    try {
+        const data = {
+            favorites: favorites,
+            watchedVideos: watchedVideos,
+            ratings: getRatings(),
+            aiConfig: getAIConfig(), // 新增：AI配置数据
+            timestamp: new Date().toISOString(),
+            version: '1.1' // 更新版本号
+        };
+        
+        // 保存到localStorage
+        localStorage.setItem('youtubeChannelsData', JSON.stringify(data));
+        
+        // 同时保存各个独立的数据项，确保兼容性
+        localStorage.setItem('youtubeFavorites', JSON.stringify(favorites));
+        localStorage.setItem('watchedVideos', JSON.stringify(watchedVideos));
+        localStorage.setItem('youtubeRatings', JSON.stringify(data.ratings));
+        localStorage.setItem('aiConfig', JSON.stringify(data.aiConfig));
+        
+        console.log('✅ 所有数据已保存到浏览器');
+    } catch (error) {
+        console.error('❌ 数据保存失败:', error);
+    }
+}
+
+// 获取AI配置数据
+function getAIConfig() {
+    return {
+        provider: aiConfig.provider || 'gemini',
+        openai: {
+            apiKey: aiConfig.openai.apiKey || '',
+            model: aiConfig.openai.model || 'gpt-4o'
+        },
+        gemini: {
+            apiKey: aiConfig.gemini.apiKey || '',
+            model: aiConfig.gemini.model || 'gemini-1.5-flash'
+        },
+        groq: {
+            apiKey: aiConfig.groq.apiKey || '',
+            model: aiConfig.groq.model || 'llama-3.1-70b-versatile'
+        }
     };
-    localStorage.setItem('youtubeChannelsData', JSON.stringify(data));
+}
+
+// 加载AI配置数据
+function loadAIConfig() {
+    try {
+        const savedConfig = localStorage.getItem('aiConfig');
+        if (savedConfig) {
+            const config = JSON.parse(savedConfig);
+            if (config.provider) aiConfig.provider = config.provider;
+            if (config.openai) {
+                aiConfig.openai.apiKey = config.openai.apiKey || '';
+                aiConfig.openai.model = config.openai.model || 'gpt-4o';
+            }
+            if (config.gemini) {
+                aiConfig.gemini.apiKey = config.gemini.apiKey || '';
+                aiConfig.gemini.model = config.gemini.model || 'gemini-1.5-flash';
+            }
+            if (config.groq) {
+                aiConfig.groq.apiKey = config.groq.apiKey || '';
+                aiConfig.groq.model = config.groq.model || 'llama-3.1-70b-versatile';
+            }
+        }
+    } catch (error) {
+        console.error('AI配置加载失败:', error);
+    }
 }
 
 function loadAllData() {
-    const savedData = localStorage.getItem('youtubeChannelsData');
-    if (savedData) {
-        try {
+    try {
+        console.log('🔄 开始加载数据...');
+        
+        // 加载主要数据
+        const savedData = localStorage.getItem('youtubeChannelsData');
+        if (savedData) {
             const data = JSON.parse(savedData);
+            console.log('📦 从统一数据中加载:', {
+                hasRatings: !!data.ratings,
+                hasFavorites: !!data.favorites,
+                hasWatchedVideos: !!data.watchedVideos,
+                hasAIConfig: !!data.aiConfig
+            });
             
+            // 恢复评分数据
             if (data.ratings) {
                 data.ratings.forEach(rating => {
                     channelsData.forEach(category => {
@@ -4268,20 +6668,86 @@ function loadAllData() {
                         });
                     });
                 });
+                console.log(`✅ 已恢复 ${data.ratings.length} 个频道评分`);
             }
             
+            // 恢复收藏夹数据
             if (data.favorites) {
-                localStorage.setItem('youtubeFavorites', JSON.stringify(data.favorites));
                 favorites = data.favorites;
+                console.log(`✅ 已恢复 ${favorites.length} 个收藏频道`);
             }
             
+            // 恢复已看视频数据
             if (data.watchedVideos) {
-                localStorage.setItem('watchedVideos', JSON.stringify(data.watchedVideos));
                 watchedVideos = data.watchedVideos;
+                const totalVideos = Object.values(watchedVideos).reduce((sum, videos) => sum + videos.length, 0);
+                console.log(`✅ 已恢复 ${Object.keys(watchedVideos).length} 个频道的 ${totalVideos} 个已看视频`);
             }
-        } catch (error) {
-            console.error('数据恢复失败:', error);
+            
+            // 恢复AI配置数据
+            if (data.aiConfig) {
+                if (data.aiConfig.provider) aiConfig.provider = data.aiConfig.provider;
+                if (data.aiConfig.openai) {
+                    aiConfig.openai.apiKey = data.aiConfig.openai.apiKey || '';
+                    aiConfig.openai.model = data.aiConfig.openai.model || 'gpt-4o';
+                }
+                if (data.aiConfig.gemini) {
+                    aiConfig.gemini.apiKey = data.aiConfig.gemini.apiKey || '';
+                    aiConfig.gemini.model = data.aiConfig.gemini.model || 'gemini-1.5-flash';
+                }
+                if (data.aiConfig.groq) {
+                    aiConfig.groq.apiKey = data.aiConfig.groq.apiKey || '';
+                    aiConfig.groq.model = data.aiConfig.groq.model || 'llama-3.1-70b-versatile';
+                }
+                console.log(`✅ 已恢复AI配置 (提供商: ${aiConfig.provider})`);
+            }
+        } else {
+            console.log('📦 未找到统一数据，尝试从独立存储加载...');
+            
+            // 兼容性：从独立存储中加载数据（如果主数据不存在）
+            // 加载收藏夹
+            const savedFavorites = localStorage.getItem('youtubeFavorites');
+            if (savedFavorites) {
+                favorites = JSON.parse(savedFavorites);
+                console.log(`✅ 从独立存储恢复 ${favorites.length} 个收藏频道`);
+            }
+            
+            // 加载已看视频
+            const savedWatchedVideos = localStorage.getItem('watchedVideos');
+            if (savedWatchedVideos) {
+                watchedVideos = JSON.parse(savedWatchedVideos);
+                const totalVideos = Object.values(watchedVideos).reduce((sum, videos) => sum + videos.length, 0);
+                console.log(`✅ 从独立存储恢复 ${Object.keys(watchedVideos).length} 个频道的 ${totalVideos} 个已看视频`);
+            }
+            
+            // 加载评分
+            const savedRatings = localStorage.getItem('youtubeRatings');
+            if (savedRatings) {
+                const ratings = JSON.parse(savedRatings);
+                ratings.forEach(rating => {
+                    channelsData.forEach(category => {
+                        category.channels.forEach(channel => {
+                            if (channel.name === rating.name) {
+                                channel.rating = rating.rating;
+                            }
+                        });
+                    });
+                });
+                console.log(`✅ 从独立存储恢复 ${ratings.length} 个频道评分`);
+            }
+            
+            // 加载AI配置
+            loadAIConfig();
         }
+        
+        console.log('✅ 所有数据已从浏览器恢复完成');
+        console.log('📊 当前数据状态:', {
+            favorites: favorites.length,
+            watchedChannels: Object.keys(watchedVideos).length,
+            totalWatchedVideos: Object.values(watchedVideos).reduce((sum, videos) => sum + videos.length, 0)
+        });
+    } catch (error) {
+        console.error('❌ 数据恢复失败:', error);
     }
 }
 
@@ -4311,11 +6777,13 @@ function getRatings() {
 function exportData() {
     try {
         const data = {
-            favorites: getFavorites(),
-            watchedVideos: getWatchedVideos(),
+            favorites: favorites,
+            watchedVideos: watchedVideos,
             ratings: getRatings(),
+            aiConfig: getAIConfig(), // 新增：AI配置数据
             timestamp: new Date().toISOString(),
-            version: '1.0'
+            version: '1.1', // 更新版本号
+            channelsDataVersion: 'v1' // 可用于未来兼容性检查
         };
         
         const dataStr = JSON.stringify(data, null, 2);
@@ -4328,49 +6796,116 @@ function exportData() {
         link.click();
         document.body.removeChild(link);
         
-        alert('数据导出成功！');
+        alert('✅ 数据导出成功！包含所有频道评分、收藏夹、已看视频和AI配置数据。');
     } catch (error) {
         console.error('导出失败:', error);
-        alert('数据导出失败！');
+        alert('❌ 数据导出失败！');
     }
+}
+
+// 将导入的数据迁移/规范化为当前版本所需的结构
+function migrateImportedData(data) {
+    if (!data || typeof data !== 'object') return data;
+
+    const migrated = Object.assign({}, data);
+
+    // favorites: 允许多种格式 -> 规范为数组
+    if (!Array.isArray(migrated.favorites)) {
+        if (migrated.favorites && typeof migrated.favorites === 'object') {
+            // 可能是 {name: true} 的形式
+            migrated.favorites = Object.keys(migrated.favorites).filter(k => migrated.favorites[k]);
+        } else {
+            migrated.favorites = [];
+        }
+    }
+
+    // watchedVideos: 期望为 {channelName: [{...}, ...]}，兼容旧版数组或其他格式
+    if (!migrated.watchedVideos || typeof migrated.watchedVideos !== 'object' || Array.isArray(migrated.watchedVideos)) {
+        // 如果是数组，尝试按照可能的旧结构转换
+        if (Array.isArray(migrated.watchedVideos)) {
+            const map = {};
+            migrated.watchedVideos.forEach(item => {
+                // 旧格式可能包含 channel 字段
+                const channel = item.channel || item.channelName || 'unknown';
+                if (!map[channel]) map[channel] = [];
+                map[channel].push({ url: item.url || item.link || '', title: item.title || '', notes: item.notes || '', date: item.date || new Date().toISOString() });
+            });
+            migrated.watchedVideos = map;
+        } else {
+            migrated.watchedVideos = {};
+        }
+    }
+
+    // ratings: 期望为 [{name, rating}]，兼容 {name:rating} 的 map
+    if (migrated.ratings && !Array.isArray(migrated.ratings) && typeof migrated.ratings === 'object') {
+        const arr = [];
+        Object.keys(migrated.ratings).forEach(name => {
+            arr.push({ name, rating: migrated.ratings[name] });
+        });
+        migrated.ratings = arr;
+    }
+
+    // 确保存在 ratings 字段
+    if (!Array.isArray(migrated.ratings)) migrated.ratings = [];
+
+    // 如果没有 version，可以设置为旧版本标记
+    if (!migrated.version) migrated.version = 'legacy';
+
+    return migrated;
 }
 
 function importData() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = function(event) {
         const file = event.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const data = JSON.parse(e.target.result);
-                
-                if (!data.favorites || !data.watchedVideos || !data.ratings) {
-                    throw new Error('数据格式不正确');
-                }
-                
-                if (confirm('确定要导入数据吗？这将覆盖当前所有数据！')) {
+                let data = JSON.parse(e.target.result);
+                // 先迁移/规范化数据以提高兼容性
+                data = migrateImportedData(data);
+
+                // 基本格式校验
+                if (!data || typeof data !== 'object') throw new Error('导入数据不是对象');
+                if (!Array.isArray(data.ratings)) throw new Error('ratings 应为数组');
+                if (typeof data.watchedVideos !== 'object' || data.watchedVideos === null) throw new Error('watchedVideos 格式不正确');
+                if (!Array.isArray(data.favorites)) data.favorites = Array.isArray(data.favorites) ? data.favorites : [];
+
+                if (confirm('确定要导入数据吗？这将覆盖当前所有本地数据（收藏/已看/评分）！')) {
+                    // 导入 ratings 并记录未匹配的项
+                    const unmatchedRatings = [];
                     data.ratings.forEach(rating => {
+                        let matched = false;
                         channelsData.forEach(category => {
                             category.channels.forEach(channel => {
                                 if (channel.name === rating.name) {
                                     channel.rating = rating.rating;
+                                    matched = true;
                                 }
                             });
                         });
+                        if (!matched) unmatchedRatings.push(rating.name);
                     });
-                    
-                    localStorage.setItem('youtubeFavorites', JSON.stringify(data.favorites));
-                    localStorage.setItem('watchedVideos', JSON.stringify(data.watchedVideos));
-                    
+
+                    // 写入 localStorage
+                    try {
+                        localStorage.setItem('youtubeFavorites', JSON.stringify(data.favorites));
+                        localStorage.setItem('watchedVideos', JSON.stringify(data.watchedVideos));
+                    } catch (err) {
+                        console.warn('写入 localStorage 失败：', err);
+                        alert('导入失败：无法写入本地存储');
+                        return;
+                    }
+
                     // 更新全局变量
                     favorites = data.favorites;
                     watchedVideos = data.watchedVideos;
-                    
+
                     // 重新渲染当前页面
                     if (currentView === 'favorites') {
                         renderFavoritesPage();
@@ -4379,10 +6914,16 @@ function importData() {
                     } else {
                         renderChannels(channelsData);
                     }
-                    
+
                     updateFavoritesCount();
                     updateWatchedCount();
-                    alert('数据导入成功！');
+
+                    // 提示导入结果
+                    if (unmatchedRatings.length > 0) {
+                        alert('导入完成，但以下评分项未能匹配到任何频道：\n' + unmatchedRatings.join(', '));
+                    } else {
+                        alert('数据导入成功！');
+                    }
                 }
             } catch (error) {
                 alert('数据导入失败：' + error.message);
@@ -4390,7 +6931,7 @@ function importData() {
         };
         reader.readAsText(file);
     };
-    
+
     input.click();
 }
 
@@ -4403,12 +6944,20 @@ function clearAllData() {
         // 重置全局变量
         favorites = [];
         watchedVideos = {};
-        
-        channelsData.forEach(category => {
-            category.channels.forEach(channel => {
-                channel.rating = 4;
+        // 恢复 channelsData 到初始快照（如果可用），否则保守地将评分设为 4
+        if (window.initialChannelsSnapshot) {
+            // 深拷贝以避免引用同一对象
+            const snapshot = JSON.parse(JSON.stringify(window.initialChannelsSnapshot));
+            // 用 snapshot 替换 channelsData 的内容
+            channelsData.length = 0;
+            snapshot.forEach(cat => channelsData.push(cat));
+        } else {
+            channelsData.forEach(category => {
+                category.channels.forEach(channel => {
+                    channel.rating = 4;
+                });
             });
-        });
+        }
         
         // 重新渲染当前页面
         if (currentView === 'favorites') {
@@ -4421,14 +6970,1868 @@ function clearAllData() {
         
         updateFavoritesCount();
         updateWatchedCount();
-        alert('所有数据已清除！');
+        alert('所有本地数据已清除，页面已恢复到当前项目设置所显示的默认状态。');
     }
+}
+
+// AI 学习助手相关功能
+let currentAIVideo = null;
+let aiChatHistory = [];
+let extractedVideoContent = null;
+
+// AI API 配置
+let aiConfig = {
+    provider: localStorage.getItem('aiProvider') || 'gemini', // 默认使用免费的 Gemini
+    openai: {
+        apiKey: localStorage.getItem('openaiApiKey') || '',
+        model: localStorage.getItem('openaiModel') || 'gpt-4o'
+    },
+    gemini: {
+        apiKey: localStorage.getItem('geminiApiKey') || '',
+        model: localStorage.getItem('geminiModel') || 'gemini-1.5-flash'
+    },
+    groq: {
+        apiKey: localStorage.getItem('groqApiKey') || '',
+        model: localStorage.getItem('groqModel') || 'llama-3.1-70b-versatile'
+    }
+};
+
+// 为了向后兼容，保留 openaiConfig
+let openaiConfig = aiConfig.openai;
+
+// 保存 AI API 配置
+function saveOpenAIConfig() {
+    const provider = document.getElementById('aiProvider').value;
+    
+    // 根据选择的提供商获取配置
+    let apiKey, model;
+    
+    if (provider === 'gemini') {
+        apiKey = document.getElementById('geminiApiKey').value.trim();
+        model = document.getElementById('geminiModel').value;
+        
+        if (!apiKey) {
+            alert('请输入 Google Gemini API Key');
+            return;
+        }
+        
+        aiConfig.gemini.apiKey = apiKey;
+        aiConfig.gemini.model = model;
+        localStorage.setItem('geminiApiKey', apiKey);
+        localStorage.setItem('geminiModel', model);
+        
+    } else if (provider === 'groq') {
+        apiKey = document.getElementById('groqApiKey').value.trim();
+        model = document.getElementById('groqModel').value;
+        
+        if (!apiKey) {
+            alert('请输入 Groq API Key');
+            return;
+        }
+        
+        aiConfig.groq.apiKey = apiKey;
+        aiConfig.groq.model = model;
+        localStorage.setItem('groqApiKey', apiKey);
+        localStorage.setItem('groqModel', model);
+        
+    } else if (provider === 'openai') {
+        apiKey = document.getElementById('openaiApiKey').value.trim();
+        model = document.getElementById('openaiModel').value;
+        
+        if (!apiKey) {
+            alert('请输入 OpenAI API Key');
+            return;
+        }
+        
+        if (!apiKey.startsWith('sk-')) {
+            alert('OpenAI API Key 格式不正确，应该以 "sk-" 开头');
+            return;
+        }
+        
+        aiConfig.openai.apiKey = apiKey;
+        aiConfig.openai.model = model;
+        openaiConfig.apiKey = apiKey; // 向后兼容
+        openaiConfig.model = model;
+        localStorage.setItem('openaiApiKey', apiKey);
+        localStorage.setItem('openaiModel', model);
+    }
+    
+    // 保存提供商选择
+    aiConfig.provider = provider;
+    localStorage.setItem('aiProvider', provider);
+    
+    // 立即保存所有数据
+    saveAllData();
+    
+    alert(`✅ ${provider === 'gemini' ? 'Google Gemini' : provider === 'groq' ? 'Groq' : 'OpenAI'} API 配置已保存！`);
+    document.getElementById('apiConfigModal').style.display = 'none';
+    
+    const providerNames = {
+        'gemini': 'Google Gemini',
+        'groq': 'Groq',
+        'openai': 'OpenAI'
+    };
+    
+    alert(`✅ ${providerNames[provider]} API 配置已保存！现在可以使用免费的 AI 功能了。`);
+}
+
+// 清除 AI API 配置
+function clearOpenAIConfig() {
+    if (confirm('确定要清除所有 AI API 配置吗？')) {
+        // 清除所有提供商的配置
+        aiConfig.openai.apiKey = '';
+        aiConfig.openai.model = 'gpt-4o';
+        aiConfig.gemini.apiKey = '';
+        aiConfig.gemini.model = 'gemini-1.5-flash';
+        aiConfig.groq.apiKey = '';
+        aiConfig.groq.model = 'llama-3.1-70b-versatile';
+        aiConfig.provider = 'gemini';
+        
+        openaiConfig.apiKey = '';
+        openaiConfig.model = 'gpt-4o';
+        
+        localStorage.removeItem('openaiApiKey');
+        localStorage.removeItem('openaiModel');
+        localStorage.removeItem('geminiApiKey');
+        localStorage.removeItem('geminiModel');
+        localStorage.removeItem('groqApiKey');
+        localStorage.removeItem('groqModel');
+        localStorage.removeItem('aiProvider');
+        
+        document.getElementById('openaiApiKey').value = '';
+        document.getElementById('openaiModel').value = 'gpt-4o';
+        document.getElementById('geminiApiKey').value = '';
+        document.getElementById('geminiModel').value = 'gemini-1.5-flash';
+        document.getElementById('groqApiKey').value = '';
+        document.getElementById('groqModel').value = 'llama-3.1-70b-versatile';
+        document.getElementById('aiProvider').value = 'gemini';
+        
+        alert('✅ 所有 API 配置已清除');
+    }
+}
+
+// 打开 API 配置面板
+function openAPISettings() {
+    // 先隐藏AI助手模态框（如果正在显示）
+    const aiAssistantModal = document.getElementById('aiAssistantModal');
+    if (aiAssistantModal && aiAssistantModal.style.display === 'flex') {
+        window.aiAssistantWasOpen = true; // 记录AI助手之前是打开的
+        aiAssistantModal.style.display = 'none';
+    } else {
+        window.aiAssistantWasOpen = false;
+    }
+    
+    // 加载所有配置
+    document.getElementById('aiProvider').value = aiConfig.provider;
+    document.getElementById('openaiApiKey').value = aiConfig.openai.apiKey;
+    document.getElementById('openaiModel').value = aiConfig.openai.model;
+    document.getElementById('geminiApiKey').value = aiConfig.gemini.apiKey;
+    document.getElementById('geminiModel').value = aiConfig.gemini.model;
+    document.getElementById('groqApiKey').value = aiConfig.groq.apiKey;
+    document.getElementById('groqModel').value = aiConfig.groq.model;
+    
+    // 显示对应的配置面板
+    switchProviderConfig(aiConfig.provider);
+    
+    document.getElementById('apiConfigModal').style.display = 'flex';
+}
+
+// 切换提供商配置显示
+function switchProviderConfig(provider) {
+    // 隐藏所有配置
+    document.querySelectorAll('.provider-config').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // 显示选中的配置
+    if (provider === 'gemini') {
+        document.getElementById('geminiConfig').style.display = 'block';
+    } else if (provider === 'groq') {
+        document.getElementById('groqConfig').style.display = 'block';
+    } else if (provider === 'openai') {
+        document.getElementById('openaiConfig').style.display = 'block';
+    }
+}
+
+// 关闭 API 配置面板
+function closeAPISettings() {
+    document.getElementById('apiConfigModal').style.display = 'none';
+    // 如果是从AI助手打开的配置窗口，关闭后恢复AI助手显示
+    const aiAssistantModal = document.getElementById('aiAssistantModal');
+    if (aiAssistantModal && window.aiAssistantWasOpen) {
+        aiAssistantModal.style.display = 'flex';
+        window.aiAssistantWasOpen = false;
+    }
+}
+
+// 调用 Google Gemini API
+async function callGemini(messages, temperature = 0.7) {
+    if (!aiConfig.gemini.apiKey) {
+        throw new Error('请先配置 Google Gemini API Key（点击右上角设置按钮）');
+    }
+    
+    try {
+        // 转换消息格式为 Gemini 格式
+        const geminiMessages = messages
+            .filter(msg => msg.role !== 'system')
+            .map(msg => ({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            }));
+        
+        // 系统提示添加到第一条用户消息前
+        const systemMessage = messages.find(msg => msg.role === 'system');
+        if (systemMessage && geminiMessages.length > 0) {
+            geminiMessages[0].parts[0].text = systemMessage.content + '\n\n' + geminiMessages[0].parts[0].text;
+        }
+        
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${aiConfig.gemini.model}:generateContent?key=${aiConfig.gemini.apiKey}`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: geminiMessages,
+                generationConfig: {
+                    temperature: temperature,
+                    maxOutputTokens: 2000
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || '调用 Gemini API 失败');
+        }
+        
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+        
+    } catch (error) {
+        console.error('Gemini API 错误:', error);
+        throw error;
+    }
+}
+
+// 调用 Groq API
+async function callGroq(messages, temperature = 0.7) {
+    if (!aiConfig.groq.apiKey) {
+        throw new Error('请先配置 Groq API Key（点击右上角设置按钮）');
+    }
+    
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${aiConfig.groq.apiKey}`
+            },
+            body: JSON.stringify({
+                model: aiConfig.groq.model,
+                messages: messages,
+                temperature: temperature,
+                max_tokens: 2000
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || '调用 Groq API 失败');
+        }
+        
+        const data = await response.json();
+        return data.choices[0].message.content;
+        
+    } catch (error) {
+        console.error('Groq API 错误:', error);
+        throw error;
+    }
+}
+
+// 调用 OpenAI API
+async function callOpenAI(messages, temperature = 0.7) {
+    if (!aiConfig.openai.apiKey) {
+        throw new Error('请先配置 OpenAI API Key（点击右上角设置按钮）');
+    }
+    
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${aiConfig.openai.apiKey}`
+            },
+            body: JSON.stringify({
+                model: aiConfig.openai.model,
+                messages: messages,
+                temperature: temperature,
+                max_tokens: 2000
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || '调用 OpenAI API 失败');
+        }
+        
+        const data = await response.json();
+        return data.choices[0].message.content;
+        
+    } catch (error) {
+        console.error('OpenAI API 错误:', error);
+        throw error;
+    }
+}
+
+// 统一的 AI 调用函数 - 根据配置自动选择提供商
+async function callAI(messages, temperature = 0.7) {
+    const provider = aiConfig.provider;
+    
+    try {
+        if (provider === 'gemini') {
+            return await callGemini(messages, temperature);
+        } else if (provider === 'groq') {
+            return await callGroq(messages, temperature);
+        } else if (provider === 'openai') {
+            return await callOpenAI(messages, temperature);
+        } else {
+            throw new Error('未知的 AI 提供商');
+        }
+    } catch (error) {
+        console.error(`${provider} API 调用失败:`, error);
+        throw error;
+    }
+}
+
+// 为视频自动生成 AI 笔记
+async function generateVideoAINotes(videoData) {
+    // 检查是否配置了任何 AI API
+    const hasApiKey = aiConfig.gemini.apiKey || aiConfig.groq.apiKey || aiConfig.openai.apiKey;
+    if (!hasApiKey) {
+        return null;
+    }
+    
+    try {
+        // 获取视频信息
+        const videoId = extractYouTubeVideoId(videoData.url);
+        let videoInfo = { title: videoData.title || '未知标题', author: '未知创作者' };
+        
+        if (videoId) {
+            try {
+                videoInfo = await fetchYouTubeVideoInfo(videoId);
+            } catch (error) {
+                console.log('获取视频信息失败，使用默认信息');
+            }
+        }
+        
+        // 构建 AI 笔记生成提示
+        const prompt = `请为以下 YouTube 视频生成一份结构化的学习笔记：
+
+**视频信息：**
+- 标题：${videoInfo.title}
+- 创作者：${videoInfo.author}
+- 频道：${videoData.channelName || '未知'}
+${videoData.notes ? `- 用户观后感：${videoData.notes}` : ''}
+
+**要求：**
+1. 生成一份完整的学习笔记，包含以下结构：
+   - 📝 视频摘要（100-200字）
+   - 🎯 核心要点（3-5个关键概念）
+   - 💡 实践应用（具体可操作的建议）
+   - 🔗 知识拓展（相关主题推荐）
+   - 📚 学习建议（如何深化理解）
+
+2. 使用 HTML 格式，包含适当的标签（h3, ul, li, p, strong 等）
+3. 语言简洁明了，便于复习和回顾
+4. 结合用户观后感，提供个性化建议
+
+请生成专业、实用的学习笔记。`;
+
+        const messages = [
+            {
+                role: 'system',
+                content: '你是一个专业的学习笔记生成专家，擅长分析教育视频并生成高质量的结构化学习笔记。你的笔记应该专业、实用、易于理解和复习。'
+            },
+            {
+                role: 'user',
+                content: prompt
+            }
+        ];
+        
+        const aiNotes = await callAI(messages, 0.6); // 使用较低的温度值确保一致性
+        return aiNotes;
+        
+    } catch (error) {
+        console.error('生成视频 AI 笔记失败:', error);
+        throw error;
+    }
+}
+
+// 显示 AI 笔记生成状态
+function showAINotesGenerationStatus() {
+    // 创建状态提示
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'aiNotesGenerationStatus';
+    statusDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    statusDiv.innerHTML = `
+        <div style="width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <span>AI 正在生成学习笔记...</span>
+    `;
+    
+    document.body.appendChild(statusDiv);
+    
+    // 添加动画样式
+    if (!document.getElementById('aiNotesAnimationStyles')) {
+        const style = document.createElement('style');
+        style.id = 'aiNotesAnimationStyles';
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+// 清理 AI 笔记生成状态
+function clearAINotesGenerationStatus() {
+    const statusDiv = document.getElementById('aiNotesGenerationStatus');
+    if (statusDiv) {
+        statusDiv.remove();
+    }
+}
+
+
+// 快速建议功能
+function toggleQuickSuggestions() {
+    const quickSuggestions = document.getElementById('quickSuggestions');
+    const isVisible = quickSuggestions.style.display !== 'none';
+    
+    if (isVisible) {
+        quickSuggestions.style.display = 'none';
+    } else {
+        quickSuggestions.style.display = 'block';
+    }
+}
+
+// 插入建议到输入框
+function insertSuggestion(suggestion) {
+    const input = document.getElementById('aiChatInput');
+    input.value = suggestion;
+    input.focus();
+    
+    // 自动发送（可选）
+    // sendAIMessage(suggestion);
+}
+
+// 滚动到建议区域
+function scrollToSuggestions() {
+    const suggestionsPanel = document.querySelector('.ai-suggestions-panel');
+    if (suggestionsPanel) {
+        suggestionsPanel.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // 添加高亮效果
+        suggestionsPanel.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.3)';
+        setTimeout(() => {
+            suggestionsPanel.style.boxShadow = '';
+        }, 2000);
+    }
+}
+
+// 键盘快捷键支持
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + ? 打开建议
+        if ((e.ctrlKey || e.metaKey) && e.key === '?') {
+            e.preventDefault();
+            toggleQuickSuggestions();
+        }
+        
+        // Ctrl/Cmd + Shift + ? 滚动到建议区域
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '?') {
+            e.preventDefault();
+            scrollToSuggestions();
+        }
+    });
+}
+
+// 折叠/展开视频详细信息（支持频道编辑页面和已看视频页面）
+function toggleVideoCollapse(button) {
+    const url = button.dataset.url;
+    
+    // 查找对应的内容区域（频道编辑页面）
+    const videoContent = document.querySelector(`.video-content[data-url="${url}"]`);
+    
+    // 查找对应的内容区域（已看视频页面）
+    const watchedVideoContent = document.querySelector(`.watched-video-content[data-url="${url}"]`);
+    
+    if (videoContent) {
+        // 切换折叠状态
+        videoContent.classList.toggle('collapsed');
+        button.classList.toggle('collapsed');
+    } else if (watchedVideoContent) {
+        // 切换折叠状态
+        watchedVideoContent.classList.toggle('collapsed');
+        button.classList.toggle('collapsed');
+    }
+    
+    console.log('✅ 折叠按钮已触发，URL:', url);
+}
+
+// 打开视频编辑模态框（通用函数）
+function openVideoEditModal(channelName, videoUrl, videoTitle, videoNotes) {
+    // 填充模态框内容
+    document.getElementById('videoModalUrl').value = videoUrl || '';
+    document.getElementById('videoModalTitle').value = videoTitle || '';
+    document.getElementById('videoModalNotes').value = videoNotes || '';
+    
+    // 存储当前编辑的频道和视频信息
+    window.currentEditingVideo = {
+        channelName: channelName,
+        originalUrl: videoUrl,
+        originalTitle: videoTitle,
+        originalNotes: videoNotes
+    };
+    
+    // 显示模态框
+    document.getElementById('videoEditModal').style.display = 'flex';
+}
+
+// 验证URL格式
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+// 显示 AI 笔记生成完成通知
+function showAINotesGeneratedNotification() {
+    // 移除生成状态提示
+    clearAINotesGenerationStatus();
+    
+    // 显示完成通知
+    const notificationDiv = document.createElement('div');
+    notificationDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    notificationDiv.innerHTML = `
+        <div style="width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20,6 9,17 4,12"></polyline>
+            </svg>
+        </div>
+        <span>✅ AI 学习笔记已生成！</span>
+    `;
+    
+    document.body.appendChild(notificationDiv);
+    
+    // 3秒后自动移除
+    setTimeout(() => {
+        notificationDiv.style.animation = 'slideInRight 0.3s ease-out reverse';
+        setTimeout(() => notificationDiv.remove(), 300);
+    }, 3000);
+}
+
+// 为指定视频手动生成 AI 笔记
+async function generateAINotesForVideo(channelName, videoUrl) {
+    // 找到对应的视频数据
+    if (!watchedVideos[channelName]) {
+        alert('未找到该频道的视频数据');
+        return;
+    }
+    
+    const video = watchedVideos[channelName].find(v => v.url === videoUrl);
+    if (!video) {
+        alert('未找到该视频');
+        return;
+    }
+    
+    // 检查是否已经生成过
+    if (video.aiNotesGenerated) {
+        if (confirm('该视频已有 AI 笔记，是否重新生成？')) {
+            // 继续生成
+        } else {
+            return;
+        }
+    }
+    
+    // 显示生成状态
+    showAINotesGenerationStatus();
+    
+    try {
+        // 生成 AI 笔记
+        const aiNotes = await generateVideoAINotes({
+            ...video,
+            channelName: channelName
+        });
+        
+        if (aiNotes) {
+            // 更新视频数据
+            video.aiNotes = aiNotes;
+            video.aiNotesGenerated = true;
+            
+            // 保存到本地存储
+            saveAllData();
+            
+            // 根据当前页面重新渲染正确的列表
+            if (currentView === 'watched') {
+                renderWatchedVideosPage();
+            } else {
+                renderWatchedVideosList();
+            }
+            
+            // 显示成功通知
+            showAINotesGeneratedNotification();
+        } else {
+            // 如果没有生成笔记（比如没有配置 API），移除加载状态
+            clearAINotesGenerationStatus();
+            alert('无法生成 AI 笔记：请先配置 AI API（点击右上角设置按钮）');
+        }
+        
+    } catch (error) {
+        console.error('生成 AI 笔记失败:', error);
+        
+        // 移除加载状态
+        clearAINotesGenerationStatus();
+        alert('生成 AI 笔记失败：' + error.message);
+    }
+}
+
+// 打开 AI 助手
+function openAIAssistant(videoData) {
+    currentAIVideo = videoData;
+    extractedVideoContent = null;
+    
+    // 更新上下文信息
+    document.getElementById('aiChannelName').textContent = videoData.channelName || '未知频道';
+    document.getElementById('aiVideoTitle').textContent = videoData.title || videoData.url || '无标题';
+    document.getElementById('aiUserNotes').textContent = videoData.notes || '暂无观后感';
+    
+    // 如果有 URL，自动填充到提取输入框
+    if (videoData.url) {
+        document.getElementById('youtubeUrlInput').value = videoData.url;
+    }
+    
+    // 重置提取状态
+    document.getElementById('extractStatus').style.display = 'none';
+    document.getElementById('videoTranscript').style.display = 'none';
+    
+    // 清空聊天历史
+    aiChatHistory = [];
+    
+    // 检查 API 配置状态
+    const hasApiKey = aiConfig.gemini.apiKey || aiConfig.groq.apiKey || aiConfig.openai.apiKey;
+    let apiStatusMessage = '';
+    
+    if (hasApiKey) {
+        const providerNames = {
+            'gemini': '🎁 Google Gemini（免费）',
+            'groq': '⚡ Groq（免费）',
+            'openai': '💰 OpenAI'
+        };
+        const currentProvider = providerNames[aiConfig.provider] || 'AI';
+        apiStatusMessage = `<p style="padding: 8px; background: #d1fae5; border-radius: 6px; font-size: 0.85rem;">✅ <strong>${currentProvider} 已配置</strong> - 使用真实 AI 功能</p>`;
+    } else {
+        apiStatusMessage = '<p style="padding: 8px; background: #fef3c7; border-radius: 6px; font-size: 0.85rem;">⚠️ <strong>演示模式</strong> - 点击右上角设置按钮配置免费 AI API（推荐 Google Gemini 或 Groq）</p>';
+    }
+    
+    document.getElementById('aiChatMessages').innerHTML = `
+        <div class="ai-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <p>你好！我是你的 AI 学习助手。</p>
+                <p><strong>智能功能：</strong></p>
+                <ul style="margin: 8px 0; padding-left: 20px;">
+                    <li>📝 自动提取 YouTube 视频内容和字幕</li>
+                    <li>🤖 基于视频内容生成学习笔记（使用免费 AI）</li>
+                    <li>💬 智能问答，帮助你深度理解内容</li>
+                    <li>📊 提供个性化学习建议</li>
+                </ul>
+                ${apiStatusMessage}
+                <p style="margin-top: 12px;">点击"提取内容"按钮开始分析视频，或直接问我问题！</p>
+            </div>
+        </div>
+    `;
+    
+    // 显示模态框
+    document.getElementById('aiAssistantModal').style.display = 'flex';
+}
+
+// 关闭 AI 助手
+function closeAIAssistant() {
+    document.getElementById('aiAssistantModal').style.display = 'none';
+    currentAIVideo = null;
+    aiChatHistory = [];
+    extractedVideoContent = null;
+}
+
+// 提取 YouTube 视频 ID
+function extractYouTubeVideoId(url) {
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /^([a-zA-Z0-9_-]{11})$/
+    ];
+    
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) return match[1];
+    }
+    return null;
+}
+
+// 提取 YouTube 视频内容
+async function extractYouTubeContent() {
+    const urlInput = document.getElementById('youtubeUrlInput');
+    const extractBtn = document.getElementById('extractVideoBtn');
+    const extractStatus = document.getElementById('extractStatus');
+    const videoTranscript = document.getElementById('videoTranscript');
+    const transcriptContent = document.getElementById('transcriptContent');
+    
+    const url = urlInput.value.trim();
+    if (!url) {
+        alert('请输入 YouTube 视频链接');
+        return;
+    }
+    
+    const videoId = extractYouTubeVideoId(url);
+    if (!videoId) {
+        alert('无效的 YouTube 链接，请检查后重试');
+        return;
+    }
+    
+    // 显示加载状态
+    extractBtn.disabled = true;
+    extractStatus.style.display = 'flex';
+    extractStatus.querySelector('.status-message').textContent = '正在提取视频内容...';
+    videoTranscript.style.display = 'none';
+    
+    try {
+        // 1. 获取视频信息
+        extractStatus.querySelector('.status-message').textContent = '正在获取视频信息...';
+        const videoInfo = await fetchYouTubeVideoInfo(videoId);
+        
+        // 2. 提取字幕（如果可用）
+        extractStatus.querySelector('.status-message').textContent = '正在提取视频字幕...';
+        const transcript = await fetchYouTubeTranscript(videoId);
+        
+        // 3. 使用 AI 生成笔记
+        extractStatus.querySelector('.status-message').textContent = '正在生成学习笔记...';
+        const aiNotes = await generateAINotesFromContent(videoInfo, transcript);
+        
+        // 保存提取的内容
+        extractedVideoContent = {
+            videoId,
+            videoInfo,
+            transcript,
+            aiNotes
+        };
+        
+        // 显示结果
+        transcriptContent.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <strong>📺 视频标题：</strong>${videoInfo.title}
+            </div>
+            <div style="margin-bottom: 12px;">
+                <strong>📝 AI 生成笔记：</strong>
+                <div style="margin-top: 8px; padding: 12px; background: #f8f9ff; border-radius: 8px;">
+                    ${aiNotes}
+                </div>
+            </div>
+            ${transcript ? `
+            <div style="margin-top: 12px;">
+                <strong>📄 视频字幕：</strong>
+                <div style="margin-top: 8px; max-height: 150px; overflow-y: auto; padding: 8px; background: #f9fafb; border-radius: 6px; font-size: 0.8rem; line-height: 1.5;">
+                    ${transcript}
+                </div>
+            </div>
+            ` : ''}
+        `;
+        
+        extractStatus.style.display = 'none';
+        videoTranscript.style.display = 'block';
+        
+        // 自动发送一条消息告知用户
+        addChatMessage('ai', `✅ 视频内容提取完成！\n\n我已经分析了这个视频的内容并生成了学习笔记。现在你可以问我关于这个视频的任何问题，我会基于视频的实际内容为你解答！`);
+        
+    } catch (error) {
+        console.error('提取视频内容失败:', error);
+        extractStatus.querySelector('.status-message').textContent = '提取失败：' + error.message;
+        extractStatus.style.background = '#fee2e2';
+        extractStatus.style.color = '#991b1b';
+        
+        setTimeout(() => {
+            extractStatus.style.display = 'none';
+        }, 3000);
+    } finally {
+        extractBtn.disabled = false;
+    }
+}
+
+// 获取 YouTube 视频信息（使用 oEmbed API）
+async function fetchYouTubeVideoInfo(videoId) {
+    try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+        const response = await fetch(oembedUrl);
+        
+        if (!response.ok) {
+            throw new Error('无法获取视频信息');
+        }
+        
+        const data = await response.json();
+        return {
+            title: data.title,
+            author: data.author_name,
+            thumbnail: data.thumbnail_url
+        };
+    } catch (error) {
+        console.error('获取视频信息失败:', error);
+        return {
+            title: '视频标题（无法获取）',
+            author: '未知',
+            thumbnail: ''
+        };
+    }
+}
+
+// 提取 YouTube 字幕（模拟实现）
+async function fetchYouTubeTranscript(videoId) {
+    // 注意：由于跨域限制，直接在前端提取 YouTube 字幕比较困难
+    // 这里提供模拟实现，实际应用中需要：
+    // 1. 使用后端服务器代理请求
+    // 2. 使用 YouTube Data API v3
+    // 3. 使用第三方字幕提取服务
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // 返回模拟字幕内容
+    return `这是模拟的字幕内容。在实际应用中，这里会显示从 YouTube 提取的真实字幕。
+
+实现方式：
+1. 使用 YouTube Data API v3 获取字幕轨道
+2. 使用第三方库（如 youtube-transcript-api）
+3. 部署后端服务处理字幕提取
+
+当前为演示模式，AI 会基于视频标题和你的观后感提供智能回答。`;
+}
+
+// 使用 AI 生成学习笔记
+async function generateAINotesFromContent(videoInfo, transcript) {
+    // 如果配置了 OpenAI API，使用真实的 AI 生成
+    if (openaiConfig.apiKey) {
+        try {
+            const prompt = `请基于以下 YouTube 视频信息生成一份详细的学习笔记：
+
+**视频标题：** ${videoInfo.title}
+**创作者：** ${videoInfo.author}
+${transcript ? `**视频字幕/内容：**\n${transcript.substring(0, 3000)}` : ''}
+
+请生成包含以下内容的学习笔记（使用 HTML 格式）：
+1. 🎯 核心要点（3-5个关键概念）
+2. 📝 详细总结（视频的主要内容）
+3. 💡 学习建议（如何应用这些知识）
+4. 🔗 进阶学习方向（相关主题推荐）
+
+请用结构化、易读的方式呈现，使用适当的 HTML 标签（strong, ul, li, p 等）。`;
+
+            const messages = [
+                {
+                    role: 'system',
+                    content: '你是一个专业的学习助手，擅长分析教育视频并生成高质量的学习笔记。你的回复应该专业、结构化，并且富有洞察力。'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ];
+            
+            const aiNotes = await callOpenAI(messages, 0.7);
+            return aiNotes;
+            
+        } catch (error) {
+            console.error('AI 生成笔记失败:', error);
+            // 如果 API 调用失败，返回错误提示
+            return `
+<div style="padding: 12px; background: #fee2e2; border-radius: 8px; color: #991b1b;">
+    <strong>⚠️ AI 笔记生成失败：</strong>${error.message}
+</div>
+<p style="margin-top: 12px;">请检查：</p>
+<ul style="padding-left: 20px;">
+    <li>API Key 是否正确</li>
+    <li>账户是否有足够余额</li>
+    <li>网络连接是否正常</li>
+</ul>
+            `;
+        }
+    }
+    
+    // 如果没有配置 API，返回模拟内容
+    const notes = `
+<strong>🎯 核心要点：</strong>
+<ul style="margin: 8px 0; padding-left: 20px; line-height: 1.8;">
+    <li><strong>主题：</strong>${videoInfo.title}</li>
+    <li><strong>创作者：</strong>${videoInfo.author}</li>
+    <li><strong>关键概念：</strong>基于视频内容的核心学习点</li>
+</ul>
+
+<strong>💡 学习建议：</strong>
+<ul style="margin: 8px 0; padding-left: 20px; line-height: 1.8;">
+    <li>做笔记：记录关键概念和个人思考</li>
+    <li>实践应用：思考如何将学到的知识应用到实际中</li>
+    <li>复习巩固：定期回顾加深理解</li>
+</ul>
+
+<strong>🔗 相关资源：</strong>
+<p style="margin: 8px 0;">基于这个视频的主题，我可以为你推荐相关的学习资源和频道。</p>
+
+<div style="margin-top: 12px; padding: 12px; background: #fef3c7; border-radius: 8px; font-size: 0.85rem;">
+    <strong>💡 提示：</strong>配置 OpenAI API Key（点击右上角设置按钮）后，AI 将基于视频的真实内容生成深度学习笔记。
+</div>
+    `;
+    
+    return notes;
+}
+
+// 发送 AI 消息
+async function sendAIMessage(message) {
+    if (!message.trim()) return;
+    
+    const chatMessages = document.getElementById('aiChatMessages');
+    const aiStatus = document.getElementById('aiStatus');
+    
+    // 添加用户消息
+    addChatMessage('user', message);
+    
+    // 显示 AI 思考状态
+    setAIStatus('thinking', 'AI 正在思考...');
+    
+    try {
+        // 使用真实的 AI 回复
+        const aiResponse = await generateAIResponse(message, currentAIVideo);
+        
+        // 添加 AI 回复
+        addChatMessage('ai', aiResponse);
+        setAIStatus('ready', 'AI 助手就绪');
+        
+    } catch (error) {
+        console.error('AI 回复错误:', error);
+        const errorMessage = error.message.includes('API Key') 
+            ? `⚠️ ${error.message}\n\n提示：点击右上角设置按钮配置 OpenAI API Key。`
+            : `抱歉，AI 回复出现错误：${error.message}\n\n如果问题持续，请检查 API 配置或稍后再试。`;
+        addChatMessage('ai', errorMessage);
+        setAIStatus('error', 'AI 助手暂时不可用');
+    }
+}
+
+// 添加聊天消息
+function addChatMessage(type, content) {
+    const chatMessages = document.getElementById('aiChatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `${type}-message`;
+    
+    const avatar = type === 'user' ? '👤' : '🤖';
+    messageDiv.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-content">
+            <p>${content.replace(/\n/g, '<br>')}</p>
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // 保存到聊天历史
+    aiChatHistory.push({ type, content, timestamp: new Date() });
+}
+
+// 生成 AI 回复
+async function generateAIResponse(userMessage, videoData) {
+    // 检查是否配置了任何 AI API
+    const hasApiKey = aiConfig.gemini.apiKey || aiConfig.groq.apiKey || aiConfig.openai.apiKey;
+    
+    if (hasApiKey) {
+        try {
+            // 根据问题类型构建系统提示
+            let systemPrompt = `你是一个专业的学习助手，专门帮助用户理解和掌握 YouTube 学习视频的内容。
+
+当前学习上下文：
+- 频道：${videoData.channelName || '未知'}
+- 视频：${videoData.title || '未知'}
+${videoData.notes ? `- 用户观后感：${videoData.notes}` : ''}`;
+
+            if (extractedVideoContent) {
+                systemPrompt += `
+- 视频标题：${extractedVideoContent.videoInfo.title}
+- 创作者：${extractedVideoContent.videoInfo.author}`;
+                
+                if (extractedVideoContent.transcript) {
+                    systemPrompt += `
+- 视频内容摘要：${extractedVideoContent.transcript.substring(0, 1000)}...`;
+                }
+            }
+
+            // 根据问题类型调整系统提示
+            const questionType = detectQuestionType(userMessage);
+            systemPrompt += getSystemPromptByType(questionType);
+
+            systemPrompt += `
+
+请用中文回答，保持专业且易懂。`;
+
+            // 构建对话历史
+            const messages = [
+                { role: 'system', content: systemPrompt }
+            ];
+            
+            // 添加最近的对话历史（最多5轮）
+            const recentHistory = aiChatHistory.slice(-10);
+            recentHistory.forEach(msg => {
+                messages.push({
+                    role: msg.type === 'user' ? 'user' : 'assistant',
+                    content: msg.content
+                });
+            });
+            
+            // 添加当前用户消息
+            messages.push({
+                role: 'user',
+                content: userMessage
+            });
+            
+            // 调用 AI API（自动选择配置的提供商）
+            const aiResponse = await callAI(messages, 0.8);
+            return aiResponse;
+            
+        } catch (error) {
+            console.error('AI API 调用失败:', error);
+            throw error;
+        }
+    }
+    
+    // 如果没有配置 API，使用模拟回复
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+    
+    // 如果已经提取了视频内容，使用更智能的回复
+    if (extractedVideoContent) {
+        const { videoInfo, transcript, aiNotes } = extractedVideoContent;
+        
+        const intelligentResponses = {
+            '核心观点': `基于视频"${videoInfo.title}"的内容分析：\n\n**核心观点：**\n1. **主题**：${videoInfo.title}\n2. **创作者**：${videoInfo.author}\n3. **关键内容**：视频涵盖了重要的学习理念和实践方法\n\n${videoData.notes ? `**结合你的观后感：**\n"${videoData.notes}"\n\n这说明你已经理解了视频的核心价值。` : ''}\n\n**建议：**\n- 将学到的概念记录在笔记中\n- 思考如何应用到实际学习中\n- 定期回顾巩固理解`,
+            
+            '应用知识': `基于视频"${videoInfo.title}"，以下是具体的应用建议：\n\n**立即行动：**\n- 📝 记录视频中提到的关键方法\n- 🎯 设定一个具体的实践目标\n- ⏰ 制定每日/每周的学习计划\n\n**中期规划：**\n- 📊 追踪学习进度\n- 🔄 定期复习和调整方法\n- 💬 与他人分享学习心得\n\n**长期发展：**\n- 🌱 建立持续学习的习惯\n- 🔗 探索相关的进阶内容\n- 🎓 将知识体系化\n\n${videoData.notes ? `你的观后感"${videoData.notes}"已经是很好的开始！` : ''}`,
+            
+            '相关资源': `基于"${videoInfo.title}"的主题，我为你推荐：\n\n**相关频道：**\n- ${videoInfo.author}（当前视频创作者）\n- 同领域的其他优质创作者\n- 进阶学习资源推荐\n\n**学习工具：**\n- 笔记应用（Notion、Obsidian）\n- 时间管理工具\n- 学习追踪应用\n\n**实践建议：**\n在你的频道列表中搜索相关主题的视频，建立系统的学习路径。`,
+            
+            '学习计划': `基于视频"${videoInfo.title}"，为你定制学习计划：\n\n**第1周：理解阶段**\n- 观看视频并做详细笔记\n- 理解核心概念\n- 记录疑问点\n\n**第2-3周：实践阶段**\n- 应用视频中的方法\n- 记录实践结果\n- 调整学习策略\n\n**第4周：巩固阶段**\n- 复习笔记\n- 总结经验\n- 规划下一步学习\n\n${videoData.notes ? `你的观后感"${videoData.notes}"可以作为学习计划的起点！` : ''}`
+        };
+        
+        // 根据关键词匹配智能回复
+        for (const [keyword, response] of Object.entries(intelligentResponses)) {
+            if (userMessage.includes(keyword)) {
+                return response;
+            }
+        }
+        
+        // 默认智能回复
+        return `基于视频"${videoInfo.title}"（by ${videoInfo.author}）和你的问题：\n\n**分析：**\n这个视频涵盖了重要的学习内容。${videoData.notes ? `你的观后感"${videoData.notes}"显示了你对内容的思考。` : ''}\n\n**建议：**\n1. **深入理解**：重点关注视频中的关键概念\n2. **实践应用**：制定具体的行动计划\n3. **持续学习**：在你的频道列表中寻找相关内容\n\n如果你想了解更具体的内容，可以问我：\n- 这个视频的核心观点是什么？\n- 如何应用这些知识？\n- 推荐一些相关资源`;
+    }
+    
+    // 原有的基础回复
+    const responses = {
+        '核心观点': `基于你的观后感"${videoData.notes || '暂无'}"，这个视频的核心观点可能包括：\n\n1. **主要概念**：视频传达了重要的学习理念\n2. **实践方法**：提供了可操作的学习技巧\n3. **个人启发**：与你当前的学习目标相关\n\n💡 **提示**：点击"提取内容"按钮，我可以基于视频的实际内容提供更精准的分析！`,
+        
+        '应用知识': `根据你的观后感，以下是一些应用建议：\n\n**立即行动：**\n- 制定具体的学习计划\n- 设置学习提醒\n- 记录学习进展\n\n**长期规划：**\n- 建立学习习惯\n- 定期复习巩固\n- 分享学习心得\n\n你想从哪个方面开始？`,
+        
+        '内容关联': `基于你的观看历史，这个视频与你之前学习的内容有以下关联：\n\n**相似主题：**\n- 学习方法论\n- 效率提升\n- 技能发展\n\n**互补内容：**\n- 理论基础 + 实践应用\n- 不同角度的观点\n- 进阶学习资源\n\n这种关联性有助于构建完整的知识体系。`,
+        
+        '推荐资源': `基于这个视频的内容，我为你推荐以下学习资源：\n\n**相关频道：**\n- 同类型优质创作者\n- 不同风格的讲解\n- 进阶内容推荐\n\n**学习工具：**\n- 笔记应用推荐\n- 学习追踪工具\n- 社区交流平台\n\n需要我为你详细介绍某个资源吗？`,
+        
+        '学习计划': `基于这个视频的内容和你的学习目标，建议制定以下学习计划：\n\n**短期目标（1-2周）：**\n- 掌握核心概念\n- 完成实践练习\n- 记录学习心得\n\n**中期目标（1个月）：**\n- 形成学习习惯\n- 应用所学知识\n- 评估学习效果\n\n**长期目标（3个月）：**\n- 建立知识体系\n- 分享学习成果\n- 持续优化方法\n\n你觉得这个计划如何？需要调整吗？`
+    };
+    
+    // 根据用户消息关键词匹配回复
+    for (const [keyword, response] of Object.entries(responses)) {
+        if (userMessage.includes(keyword)) {
+            return response;
+        }
+    }
+    
+    // 默认回复
+    return `这是一个很好的问题！基于你观看的"${videoData.title || '这个视频'}"和你的观后感"${videoData.notes}"，我建议你：\n\n1. **深入思考**：进一步分析视频中的关键概念\n2. **实践应用**：尝试将学到的知识应用到实际中\n3. **持续学习**：寻找相关的补充资源\n\n如果你有具体的问题，我可以为你提供更详细的建议。你想了解哪个方面？`;
+}
+
+// 设置 AI 状态
+function setAIStatus(status, text) {
+    const statusIndicator = document.querySelector('.status-indicator');
+    const statusText = document.querySelector('.status-text');
+    
+    statusIndicator.className = `status-indicator ${status}`;
+    statusText.textContent = text;
+}
+
+// 检测问题类型
+function detectQuestionType(userMessage) {
+    const message = userMessage.toLowerCase();
+    
+    // 知识学习类关键词
+    const knowledgeKeywords = ['核心观点', '知识点', '理解', '应用', '学习计划', '知识网络', '学习资源', '拓展'];
+    
+    // 生活成长类关键词
+    const lifeKeywords = ['生活态度', '价值观', '决策', '情感', '成长目标', '心态', '启发', '改善'];
+    
+    // 深度思考类关键词
+    const thinkingKeywords = ['看法', '观点', '思考', '反思', '推荐', '冲突', '调和', '探索', '哲学'];
+    
+    // 英语学习类关键词
+    const englishKeywords = ['英语', '词汇', '语法', '句式', '表达', '发音', '口语', '写作', '语言', '单词', '短语', '句型', '语调', '地道', '模仿', '练习'];
+    
+    if (englishKeywords.some(keyword => message.includes(keyword))) {
+        return 'english';
+    } else if (knowledgeKeywords.some(keyword => message.includes(keyword))) {
+        return 'knowledge';
+    } else if (lifeKeywords.some(keyword => message.includes(keyword))) {
+        return 'life';
+    } else if (thinkingKeywords.some(keyword => message.includes(keyword))) {
+        return 'thinking';
+    }
+    
+    return 'general';
+}
+
+// 根据问题类型获取系统提示
+function getSystemPromptByType(questionType) {
+    const prompts = {
+        knowledge: `
+
+你的角色：基于布鲁姆分类法的学习专家
+你的任务：
+1. 帮助用户理解和记忆知识点（理解层次）
+2. 指导用户将知识应用到实际中（应用层次）
+3. 分析知识之间的关联（分析层次）
+4. 协助制定学习计划（综合层次）
+5. 推荐相关学习资源（评价层次）
+
+回答风格：
+- 结构清晰，逻辑性强
+- 提供具体的实践方法
+- 使用费曼学习法：用简单的话解释复杂概念
+- 注重知识的系统性和关联性`,
+
+        life: `
+
+你的角色：基于积极心理学的成长导师
+你的任务：
+1. 帮助用户建立积极的生活态度和成长型思维
+2. 指导用户将价值观转化为实际行动
+3. 提供情感管理和决策优化建议
+4. 协助设定和实现个人成长目标
+5. 培养心理韧性和自我认知
+
+回答风格：
+- 温暖、鼓励、富有同理心
+- 关注心理成长和价值观塑造
+- 提供具体的行为改变建议
+- 强调个人成长和内在力量
+- 结合积极心理学理论给出建议`,
+
+        thinking: `
+
+你的角色：基于苏格拉底式提问的思考导师
+你的任务：
+1. 引导用户进行批判性思维和深度反思
+2. 帮助用户质疑和重新审视既有观念
+3. 促进认知整合和知识内化
+4. 启发用户探索更深层的哲学问题
+5. 培养独立思考能力和元认知
+
+回答风格：
+- 启发式提问，引导思考
+- 鼓励质疑和多元视角
+- 促进深度反思和内化
+- 连接哲学、心理学等跨学科思考
+- 培养批判性思维和独立思考`,
+
+        english: `
+
+你的角色：基于二语习得理论的英语学习专家
+你的任务：
+1. 帮助用户从视频中提取和掌握英语词汇、语法、句式
+2. 分析视频中的地道英语表达和文化内涵
+3. 提供实用的英语学习方法和练习建议
+4. 指导用户提高英语听说读写综合能力
+5. 结合交际教学法，设计真实的语言使用场景
+
+回答风格：
+- 专业、系统，基于语言学习理论
+- 提供具体的词汇、语法、句式分析
+- 给出实用的学习建议和练习方法
+- 注重地道表达和文化背景
+- 鼓励实际运用和模仿练习
+- 结合视频内容设计个性化学习方案`,
+
+        general: `
+
+你的任务：
+1. 基于视频内容和用户的观后感，提供深入的学习建议
+2. 帮助用户理解视频的核心概念
+3. 提供实践应用的具体方法
+4. 推荐相关的学习资源和路径
+5. 用友好、专业的语气回答问题`
+    };
+    
+    return prompts[questionType] || prompts.general;
+}
+
+// 生成英语学习分析
+async function generateEnglishAnalysis(videoData, analysisType) {
+    if (!openaiConfig.apiKey) {
+        return null;
+    }
+    
+    try {
+        let prompt = '';
+        let systemRole = '';
+        
+        switch (analysisType) {
+            case 'vocabulary':
+                systemRole = '你是一个专业的英语词汇教学专家，擅长分析视频中的词汇用法和教学。';
+                prompt = `请分析以下视频中的英语词汇学习价值：
+
+**视频信息：**
+- 标题：${videoData.title || '未知'}
+- 频道：${videoData.channelName || '未知'}
+${videoData.notes ? `- 用户观后感：${videoData.notes}` : ''}
+
+**请提供：**
+1. 📚 重点词汇列表（5-10个，包含音标、释义、例句）
+2. 🔤 词汇分类（学术词汇、日常词汇、俚语等）
+3. 💡 词汇学习建议（记忆方法、使用场景）
+4. 🎯 词汇练习建议（造句、翻译等）
+
+请用 HTML 格式输出，便于阅读和学习。`;
+                break;
+                
+            case 'grammar':
+                systemRole = '你是一个专业的英语语法教学专家，擅长分析语法结构和教学。';
+                prompt = `请分析以下视频中的英语语法特点：
+
+**视频信息：**
+- 标题：${videoData.title || '未知'}
+- 频道：${videoData.channelName || '未知'}
+${videoData.notes ? `- 用户观后感：${videoData.notes}` : ''}
+
+**请提供：**
+1. 📝 主要语法结构（时态、语态、从句等）
+2. 🔍 语法点详细分析（用法、规则、例句）
+3. ⚠️ 常见语法错误提醒
+4. 💪 语法练习建议（填空、改错、造句等）
+
+请用 HTML 格式输出，便于理解学习。`;
+                break;
+                
+            case 'expressions':
+                systemRole = '你是一个专业的英语表达教学专家，擅长分析地道表达和文化内涵。';
+                prompt = `请分析以下视频中的英语表达学习价值：
+
+**视频信息：**
+- 标题：${videoData.title || '未知'}
+- 频道：${videoData.channelName || '未知'}
+${videoData.notes ? `- 用户观后感：${videoData.notes}` : ''}
+
+**请提供：**
+1. 💬 地道表达收集（习语、短语、俚语）
+2. 🌍 文化背景解释（使用场合、文化内涵）
+3. 🎭 表达方式分析（正式/非正式、书面/口语）
+4. 🗣️ 实际应用建议（对话场景、写作应用）
+
+请用 HTML 格式输出，便于学习和运用。`;
+                break;
+                
+            case 'pronunciation':
+                systemRole = '你是一个专业的英语发音教学专家，擅长分析发音特点和教学。';
+                prompt = `请分析以下视频中的英语发音学习价值：
+
+**视频信息：**
+- 标题：${videoData.title || '未知'}
+- 频道：${videoData.channelName || '未知'}
+${videoData.notes ? `- 用户观后感：${videoData.notes}` : ''}
+
+**请提供：**
+1. 🗣️ 发音特点分析（口音、语调、重音）
+2. 🔊 重点音素练习（元音、辅音、连读）
+3. 📈 语调模式分析（升调、降调、停顿）
+4. 💡 发音练习建议（跟读、模仿、录音对比）
+
+请用 HTML 格式输出，便于发音练习。`;
+                break;
+        }
+        
+        const messages = [
+            { role: 'system', content: systemRole },
+            { role: 'user', content: prompt }
+        ];
+        
+        const analysis = await callOpenAI(messages, 0.7);
+        return analysis;
+        
+    } catch (error) {
+        console.error('生成英语分析失败:', error);
+        throw error;
+    }
+}
+
+// 生成学习报告
+async function generateLearningReport() {
+    if (!openaiConfig.apiKey) {
+        alert('请先配置 OpenAI API Key 以生成学习报告');
+        return;
+    }
+    
+    const watchedVideos = JSON.parse(localStorage.getItem('watchedVideos') || '[]');
+    if (watchedVideos.length === 0) {
+        alert('还没有观看记录，请先添加一些视频');
+        return;
+    }
+    
+    try {
+        setAIStatus('thinking', '正在分析你的学习数据...');
+        
+        // 分析观看历史数据
+        const learningData = analyzeLearningData(watchedVideos);
+        
+        // 生成AI报告
+        const report = await generateAIReport(learningData);
+        
+        // 显示报告
+        displayLearningReport(report, learningData);
+        
+        setAIStatus('ready', '学习报告生成完成');
+        
+    } catch (error) {
+        console.error('生成学习报告失败:', error);
+        setAIStatus('error', '生成报告失败');
+        alert('生成学习报告失败，请重试');
+    }
+}
+
+// 分析学习数据
+function analyzeLearningData(watchedVideos) {
+    const stats = {
+        totalVideos: watchedVideos.length,
+        totalWatchTime: 0,
+        categories: {},
+        channels: {},
+        englishVideos: [],
+        recentVideos: watchedVideos.slice(-10),
+        watchPattern: {},
+        skills: {}
+    };
+    
+    // 分析每个视频
+    watchedVideos.forEach(video => {
+        // 计算观看时间（如果有的话）
+        if (video.watchTime) {
+            stats.totalWatchTime += video.watchTime;
+        }
+        
+        // 分类统计
+        const category = video.category || '其他';
+        stats.categories[category] = (stats.categories[category] || 0) + 1;
+        
+        // 频道统计
+        const channel = video.channelName || '未知';
+        stats.channels[channel] = (stats.channels[channel] || 0) + 1;
+        
+        // 英语学习视频
+        if (isEnglishLearningVideo(video)) {
+            stats.englishVideos.push(video);
+        }
+        
+        // 观看模式分析
+        const date = new Date(video.watchedAt || Date.now());
+        const dayOfWeek = date.getDay();
+        const hour = date.getHours();
+        
+        if (!stats.watchPattern[dayOfWeek]) {
+            stats.watchPattern[dayOfWeek] = {};
+        }
+        stats.watchPattern[dayOfWeek][hour] = (stats.watchPattern[dayOfWeek][hour] || 0) + 1;
+        
+        // 技能分析
+        extractSkillsFromVideo(video, stats.skills);
+    });
+    
+    return stats;
+}
+
+// 判断是否为英语学习视频
+function isEnglishLearningVideo(video) {
+    const englishKeywords = ['english', '英语', 'language', 'language learning', 'vocabulary', 'grammar', 'pronunciation'];
+    const title = (video.title || '').toLowerCase();
+    const notes = (video.notes || '').toLowerCase();
+    const channel = (video.channelName || '').toLowerCase();
+    
+    return englishKeywords.some(keyword => 
+        title.includes(keyword) || notes.includes(keyword) || channel.includes(keyword)
+    );
+}
+
+// 从视频中提取技能
+function extractSkillsFromVideo(video, skillsObj) {
+    const skills = {
+        '英语学习': ['english', '英语', 'language', 'vocabulary', 'grammar', 'pronunciation'],
+        '高效学习': ['学习', 'study', 'productivity', '效率', 'method', '技巧'],
+        '生活成长': ['生活', 'life', '成长', 'growth', 'mindset', '心态'],
+        '职场发展': ['职场', 'career', '工作', 'work', 'business', '创业'],
+        '科技编程': ['tech', '科技', 'programming', '编程', 'code', 'development'],
+        '艺术创作': ['art', '艺术', 'design', '设计', 'creative', '创意'],
+        '健康健身': ['health', '健康', 'fitness', '健身', 'exercise', '运动']
+    };
+    
+    const title = (video.title || '').toLowerCase();
+    const notes = (video.notes || '').toLowerCase();
+    
+    Object.entries(skills).forEach(([skill, keywords]) => {
+        if (keywords.some(keyword => title.includes(keyword) || notes.includes(keyword))) {
+            skillsObj[skill] = (skillsObj[skill] || 0) + 1;
+        }
+    });
+}
+
+// 生成AI报告
+async function generateAIReport(learningData) {
+    const prompt = `基于以下学习数据分析，生成一份详细的个人学习报告：
+
+**学习数据统计：**
+- 总观看视频数：${learningData.totalVideos}
+- 英语学习视频数：${learningData.englishVideos.length}
+- 观看分类分布：${JSON.stringify(learningData.categories)}
+- 主要技能领域：${JSON.stringify(learningData.skills)}
+
+**最近观看的视频：**
+${learningData.recentVideos.map(video => `- ${video.title || '未知标题'} (${video.channelName || '未知频道'})`).join('\n')}
+
+**英语学习视频：**
+${learningData.englishVideos.map(video => `- ${video.title || '未知标题'} (${video.channelName || '未知频道'})`).join('\n')}
+
+请生成一份包含以下内容的学习报告：
+1. 📊 学习概览和统计数据
+2. 🗺️ 知识地图和技能分析
+3. 🎯 学习模式和习惯分析
+4. 🇺🇸 英语学习进展评估
+5. 📚 个性化学习建议和规划
+6. 🔄 复习计划和知识巩固建议
+
+请用HTML格式输出，使用丰富的emoji和清晰的层次结构。`;
+
+    const messages = [
+        { role: 'system', content: '你是一个专业的学习分析师，擅长分析个人学习数据并生成详细的学习报告和建议。' },
+        { role: 'user', content: prompt }
+    ];
+    
+    return await callOpenAI(messages, 0.7);
+}
+
+// 显示学习报告
+function displayLearningReport(report, learningData) {
+    const reportContent = document.getElementById('reportContent');
+    
+    const html = `
+        <div class="learning-stats">
+            <div class="stat-card">
+                <div class="stat-number">${learningData.totalVideos}</div>
+                <div class="stat-label">总观看视频</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${learningData.englishVideos.length}</div>
+                <div class="stat-label">英语学习视频</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${Object.keys(learningData.categories).length}</div>
+                <div class="stat-label">学习分类</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${Object.keys(learningData.skills).length}</div>
+                <div class="stat-label">技能领域</div>
+            </div>
+        </div>
+        
+        <div class="knowledge-map">
+            <h3>🗺️ 知识地图</h3>
+            <div class="skill-categories">
+                ${Object.entries(learningData.skills).map(([skill, count]) => `
+                    <div class="skill-category">
+                        <div class="category-header">
+                            <div class="category-icon">${getSkillIcon(skill)}</div>
+                            <div class="category-title">${skill}</div>
+                        </div>
+                        <div class="category-progress">
+                            <div class="progress-bar" style="width: ${(count / learningData.totalVideos * 100).toFixed(1)}%"></div>
+                        </div>
+                        <div class="category-stats">
+                            <span>${count} 个视频</span>
+                            <span>${(count / learningData.totalVideos * 100).toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        
+        ${learningData.englishVideos.length > 0 ? generateEnglishKnowledgeBase(learningData.englishVideos) : ''}
+        
+        <div class="learning-suggestions">
+            <h3>💡 AI 学习建议</h3>
+            <div class="ai-report-content">
+                ${report}
+            </div>
+        </div>
+    `;
+    
+    reportContent.innerHTML = html;
+}
+
+// 获取技能图标
+function getSkillIcon(skill) {
+    const icons = {
+        '英语学习': '🇺🇸',
+        '高效学习': '📚',
+        '生活成长': '🌱',
+        '职场发展': '💼',
+        '科技编程': '💻',
+        '艺术创作': '🎨',
+        '健康健身': '🏃‍♀️'
+    };
+    return icons[skill] || '📖';
+}
+
+// 生成英语知识库
+function generateEnglishKnowledgeBase(englishVideos) {
+    const vocabulary = extractEnglishVocabulary(englishVideos);
+    
+    return `
+        <div class="english-knowledge-base">
+            <h3>🇺🇸 英语知识库</h3>
+            <div class="vocabulary-grid">
+                ${vocabulary.map(word => `
+                    <div class="vocabulary-card">
+                        <div class="vocabulary-word">${word.word}</div>
+                        <div class="vocabulary-meaning">${word.meaning}</div>
+                        <div class="vocabulary-example">${word.example}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="review-schedule">
+                <h3>🔄 复习计划</h3>
+                ${generateReviewSchedule(vocabulary)}
+            </div>
+        </div>
+    `;
+}
+
+// 提取英语词汇
+function extractEnglishVocabulary(englishVideos) {
+    // 这里可以从AI笔记中提取词汇，或者使用模拟数据
+    const commonVocabulary = [
+        { word: 'productivity', meaning: '生产力，效率', example: 'How to improve productivity at work' },
+        { word: 'mindset', meaning: '心态，思维方式', example: 'Growth mindset is key to success' },
+        { word: 'fluency', meaning: '流利度，流畅性', example: 'Practice speaking for better fluency' },
+        { word: 'vocabulary', meaning: '词汇量，词汇', example: 'Building vocabulary takes time' },
+        { word: 'pronunciation', meaning: '发音', example: 'Work on your pronunciation daily' }
+    ];
+    
+    return commonVocabulary.slice(0, Math.min(6, englishVideos.length));
+}
+
+// 生成复习计划
+function generateReviewSchedule(vocabulary) {
+    const now = new Date();
+    const reviewItems = vocabulary.map((word, index) => {
+        const reviewDate = new Date(now.getTime() + (index + 1) * 24 * 60 * 60 * 1000);
+        return {
+            title: `复习词汇: ${word.word}`,
+            description: `复习 "${word.meaning}" 及相关例句`,
+            date: reviewDate.toLocaleDateString(),
+            status: 'pending'
+        };
+    });
+    
+    return reviewItems.map(item => `
+        <div class="review-item">
+            <div class="review-content">
+                <div class="review-title">${item.title}</div>
+                <div class="review-description">${item.description} - ${item.date}</div>
+            </div>
+            <div class="review-status ${item.status}">${item.status === 'pending' ? '待复习' : '已完成'}</div>
+        </div>
+    `).join('');
+}
+
+// 导出学习报告
+function exportLearningReport() {
+    const reportContent = document.getElementById('reportContent');
+    const reportHtml = reportContent.innerHTML;
+    
+    // 创建完整的HTML文档
+    const fullHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>个人学习报告</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; line-height: 1.6; }
+                .learning-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+                .stat-card { background: #f8f9ff; border: 1px solid #e1e8ed; border-radius: 15px; padding: 20px; text-align: center; }
+                .stat-number { font-size: 2.5rem; font-weight: 700; color: #667eea; margin-bottom: 8px; }
+                .stat-label { font-size: 1rem; color: #6c757d; }
+                .knowledge-map, .english-knowledge-base, .learning-suggestions { 
+                    background: white; border: 1px solid #e1e8ed; border-radius: 15px; 
+                    padding: 25px; margin-bottom: 30px; 
+                }
+                h3 { color: #333; margin-bottom: 20px; }
+                .skill-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+                .skill-category { background: #fff; border: 1px solid #e1e8ed; border-radius: 15px; padding: 20px; }
+                .vocabulary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+                .vocabulary-card { background: white; border: 1px solid #bfdbfe; border-radius: 10px; padding: 15px; }
+                .vocabulary-word { font-weight: 600; color: #1e40af; margin-bottom: 5px; }
+                .vocabulary-meaning { font-size: 0.9rem; color: #6c757d; margin-bottom: 8px; }
+                .vocabulary-example { font-size: 0.85rem; color: #64748b; font-style: italic; }
+            </style>
+        </head>
+        <body>
+            <h1>📊 个人学习报告</h1>
+            <p>生成时间: ${new Date().toLocaleString()}</p>
+            ${reportHtml}
+        </body>
+        </html>
+    `;
+    
+    // 下载文件
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `学习报告_${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // 重复的数据管理按键函数已删除，功能已移至页面顶部
 
-// 更新星星显示函数
-function updateStarsDisplay(channelName, rating) {
+        // AI 助手事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // API 配置相关
+            const openApiSettingsBtn = document.getElementById('openApiSettings');
+            if (openApiSettingsBtn) {
+                openApiSettingsBtn.addEventListener('click', openAPISettings);
+            }
+            
+            const closeApiConfigBtn = document.getElementById('closeApiConfig');
+            if (closeApiConfigBtn) {
+                closeApiConfigBtn.addEventListener('click', closeAPISettings);
+            }
+            
+            const saveApiKeyBtn = document.getElementById('saveApiKey');
+            if (saveApiKeyBtn) {
+                saveApiKeyBtn.addEventListener('click', saveOpenAIConfig);
+            }
+            
+            const clearApiKeyBtn = document.getElementById('clearApiKey');
+            if (clearApiKeyBtn) {
+                clearApiKeyBtn.addEventListener('click', clearOpenAIConfig);
+            }
+            
+            // API 配置模态框背景点击关闭
+            const apiConfigModal = document.getElementById('apiConfigModal');
+            if (apiConfigModal) {
+                apiConfigModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeAPISettings();
+                    }
+                });
+            }
+            
+            // 关闭 AI 助手
+            const closeAIAssistantBtn = document.getElementById('closeAIAssistant');
+            if (closeAIAssistantBtn) {
+                closeAIAssistantBtn.addEventListener('click', closeAIAssistant);
+            }
+            
+            // 提取视频内容按钮
+            const extractVideoBtn = document.getElementById('extractVideoBtn');
+            if (extractVideoBtn) {
+                extractVideoBtn.addEventListener('click', extractYouTubeContent);
+            }
+            
+            // 分类标签页切换
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    // 更新标签页状态
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 切换内容组
+                    document.querySelectorAll('.suggestion-group').forEach(group => {
+                        group.classList.remove('active');
+                        if (group.dataset.category === category) {
+                            group.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // 建议问题按钮
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.suggestion-btn')) {
+                    const btn = e.target.closest('.suggestion-btn');
+                    const question = btn.dataset.question;
+                    document.getElementById('aiChatInput').value = question;
+                    sendAIMessage(question);
+                }
+            });
+            
+            // 发送消息按钮
+            const sendAIBtn = document.getElementById('sendAIMessage');
+            if (sendAIBtn) {
+                sendAIBtn.addEventListener('click', function() {
+                    const input = document.getElementById('aiChatInput');
+                    const message = input.value.trim();
+                    if (message) {
+                        sendAIMessage(message);
+                        input.value = '';
+                    }
+                });
+            }
+            
+            // 回车发送消息
+            const aiChatInput = document.getElementById('aiChatInput');
+            if (aiChatInput) {
+                aiChatInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const message = this.value.trim();
+                        if (message) {
+                            sendAIMessage(message);
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+            
+        // 点击模态框背景关闭
+        const aiModal = document.getElementById('aiAssistantModal');
+        if (aiModal) {
+            aiModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAIAssistant();
+                }
+            });
+        }
+        
+        // AI 提供商切换事件监听
+        const aiProviderSelect = document.getElementById('aiProvider');
+        if (aiProviderSelect) {
+            aiProviderSelect.addEventListener('change', function(e) {
+                switchProviderConfig(e.target.value);
+            });
+        }
+        
+        // AI 助手按钮事件监听（使用事件委托）
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.ai-assistant-btn')) {
+                const btn = e.target.closest('.ai-assistant-btn');
+                const channelName = btn.dataset.channel;
+                const videoUrl = btn.dataset.url;
+                const videoTitle = btn.dataset.title;
+                const videoNotes = btn.dataset.notes;
+                
+                const videoData = {
+                    channelName: channelName,
+                    url: videoUrl,
+                    title: videoTitle,
+                    notes: videoNotes
+                };
+                
+                openAIAssistant(videoData);
+            }
+            
+            // 折叠/展开按钮事件监听
+            if (e.target.closest('.collapse-toggle-btn')) {
+                const btn = e.target.closest('.collapse-toggle-btn');
+                toggleVideoCollapse(btn);
+            }
+            
+            // 生成 AI 笔记按钮事件监听
+            if (e.target.closest('.generate-ai-notes-btn')) {
+                const btn = e.target.closest('.generate-ai-notes-btn');
+                const channelName = btn.dataset.channel;
+                const videoUrl = btn.dataset.url;
+                
+                generateAINotesForVideo(channelName, videoUrl);
+            }
+            
+            // 已看视频编辑按钮事件监听 - 使用视频编辑模态框
+            if (e.target.closest('.edit-watched-notes-btn')) {
+                const btn = e.target.closest('.edit-watched-notes-btn');
+                const channelName = btn.dataset.channel;
+                const videoUrl = btn.dataset.url;
+                const videoTitle = btn.dataset.title;
+                const videoNotes = btn.dataset.notes;
+                
+                // 打开视频编辑模态框
+                openVideoEditModal(channelName, videoUrl, videoTitle, videoNotes);
+            }
+        });
+    });
+
+        // 更新星星显示函数
+        function updateStarsDisplay(channelName, rating) {
     const channelCards = document.querySelectorAll('.channel-card');
     for (const card of channelCards) {
         const channelNameElement = card.querySelector(`.channel-name[data-channel="${channelName}"]`);
@@ -4459,8 +8862,9 @@ function updateRating(channelName, newRating) {
     // 实时更新星星显示
     updateStarsDisplay(channelName, parseInt(newRating));
     
-    // 自动保存数据
+    // 立即保存数据到localStorage
     saveAllData();
+    console.log(`✅ 频道 "${channelName}" 评分已保存: ${newRating}星`);
 }
 
 // 统一的toggleFavorite函数
@@ -4471,9 +8875,13 @@ function toggleFavorite(channelName) {
     } else {
         favorites.push(channelName);
     }
+    
+    // 立即保存到localStorage
     localStorage.setItem('youtubeFavorites', JSON.stringify(favorites));
     saveAllData();
     updateFavoritesCount();
+    
+    console.log(`✅ 频道 "${channelName}" 收藏状态已保存: ${index > -1 ? '取消收藏' : '已收藏'}`);
     
     // 更新所有相同频道的收藏按钮状态
     document.querySelectorAll(`[data-channel="${channelName}"]`).forEach(btn => {
@@ -4488,6 +8896,61 @@ function toggleFavorite(channelName) {
         renderFavoritesPage();
     }
 }
+
+// 注意：学习报告相关事件监听器已整合到主初始化代码块中
+
+// 强制全屏布局的JavaScript修复
+document.addEventListener('DOMContentLoaded', function() {
+    // 强制修复全屏状态下的布局
+    function forceLayoutFix() {
+        // 修复"已看视频"页面布局
+        const watchedHeaders = document.querySelectorAll('.watched-video-header');
+        const watchedActions = document.querySelectorAll('.watched-video-actions');
+        
+        watchedHeaders.forEach(header => {
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            header.style.flexDirection = 'row';
+        });
+        
+        watchedActions.forEach(action => {
+            action.style.display = 'flex';
+            action.style.flexDirection = 'row';
+            action.style.justifyContent = 'flex-end';
+            action.style.alignItems = 'center';
+            action.style.gap = '8px';
+        });
+        
+        // 修复频道编辑页面布局
+        const videoHeaders = document.querySelectorAll('.video-header');
+        const videoActions = document.querySelectorAll('.video-actions');
+        
+        videoHeaders.forEach(header => {
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            header.style.flexDirection = 'row';
+        });
+        
+        videoActions.forEach(action => {
+            action.style.display = 'flex';
+            action.style.flexDirection = 'row';
+            action.style.justifyContent = 'flex-end';
+            action.style.alignItems = 'center';
+            action.style.gap = '8px';
+        });
+    }
+    
+    // 页面加载后立即修复
+    forceLayoutFix();
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', forceLayoutFix);
+    
+    // 定期检查并修复（防止其他代码覆盖）
+    setInterval(forceLayoutFix, 1000);
+});
 
 </script>
 </body>
