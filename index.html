@@ -191,6 +191,25 @@ body {
     border-color: transparent;
 }
 
+/* 自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+}
+
 .main-content {
     padding: 40px 20px;
 }
@@ -3681,8 +3700,119 @@ body {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
+    <!-- 简单登录弹窗 -->
+    <div id="loginModal" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    ">
+        <div style="
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        ">
+            <h1 style="color: #333; margin-bottom: 10px; font-size: 28px;">📺 YouTube 精选馆</h1>
+            <p style="color: #666; margin-bottom: 30px; font-size: 16px;">登录以同步您的数据到所有设备</p>
+            
+            <!-- 登录表单 -->
+            <div id="loginFormDiv" style="margin-bottom: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <input type="email" id="loginEmail" placeholder="邮箱" 
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <input type="password" id="loginPassword" placeholder="密码" 
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <button onclick="loginUser()" style="
+                    width: 100%; padding: 12px; background: #667eea; color: white; 
+                    border: none; border-radius: 8px; font-size: 16px; cursor: pointer;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#5568d3'" onmouseout="this.style.background='#667eea'">登录</button>
+            </div>
+            
+            <!-- 注册表单 -->
+            <div id="registerFormDiv" style="margin-bottom: 20px; display: none;">
+                <div style="margin-bottom: 15px;">
+                    <input type="email" id="registerEmail" placeholder="邮箱" 
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <input type="password" id="registerPassword" placeholder="密码（至少6位）" minlength="6"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <input type="password" id="registerPasswordConfirm" placeholder="确认密码" minlength="6"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <button onclick="registerUser()" style="
+                    width: 100%; padding: 12px; background: #667eea; color: white; 
+                    border: none; border-radius: 8px; font-size: 16px; cursor: pointer;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#5568d3'" onmouseout="this.style.background='#667eea'">注册</button>
+            </div>
+            
+            <!-- 切换按钮 -->
+            <div style="margin-bottom: 20px;">
+                <button id="switchToRegisterBtn" onclick="switchToRegister()" style="
+                    background: none; border: none; color: #667eea; cursor: pointer; 
+                    text-decoration: underline; font-size: 14px;
+                ">没有账号？点击注册</button>
+                <button id="switchToLoginBtn" onclick="switchToLogin()" style="
+                    background: none; border: none; color: #667eea; cursor: pointer; 
+                    text-decoration: underline; font-size: 14px; display: none;
+                ">已有账号？点击登录</button>
+            </div>
+            
+            <!-- Google 登录按钮 -->
+            <div style="margin-bottom: 20px;">
+                <button onclick="loginWithGoogle()" style="
+                    width: 100%; padding: 12px; background: #4285f4; color: white; 
+                    border: none; border-radius: 8px; font-size: 16px; cursor: pointer;
+                    transition: background 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+                " onmouseover="this.style.background='#3367d6'" onmouseout="this.style.background='#4285f4'">
+                    <span style="font-size: 18px;">🔍</span>
+                    使用 Google 登录
+                </button>
+            </div>
+            
+            <!-- 跳过登录按钮 -->
+            <div style="margin-top: 20px;">
+                <button onclick="skipLogin()" style="
+                    width: 100%; padding: 10px; background: #6c757d; color: white; 
+                    border: none; border-radius: 8px; font-size: 14px; cursor: pointer;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">🚀 跳过登录，使用本地版本</button>
+            </div>
+            
+            <!-- 错误信息 -->
+            <div id="loginError" style="
+                color: #dc3545; background: #f8d7da; border: 1px solid #f5c6cb; 
+                padding: 10px; border-radius: 5px; margin-top: 15px; display: none;
+                font-size: 14px;
+            "></div>
+        </div>
+    </div>
+
     <header class="header">
         <div class="container">
             <h1 class="header-title"><span class="emoji">📺</span> YouTube 精选馆</h1>
@@ -3690,14 +3820,153 @@ body {
                     <p class="header-description">精选频道 · 智慧学习 · 灵感生长</p>
                     <p class="header-tagline">Learn smarter. Watch deeper. Explore further.</p>
                     <div class="header-data-management">
-                        <div class="header-data-buttons">
-                            <button id="exportBtn" class="header-data-btn export-btn">📤 导出数据</button>
-                            <button id="importBtn" class="header-data-btn import-btn">📥 导入数据</button>
-                            <button id="clearDataBtn" class="header-data-btn clear-btn">🗑️ 清除数据</button>
+                    <div class="header-data-buttons">
+                        <button id="exportBtn" class="header-data-btn export-btn">📤 导出数据</button>
+                        <button id="importBtn" class="header-data-btn import-btn">📥 导入数据</button>
+                        <button id="clearDataBtn" class="header-data-btn clear-btn">🗑️ 清除数据</button>
+                    </div>
+                </div>
+                
+                <!-- 用户信息区域 - 始终显示 -->
+                <div id="userInfo" class="user-info" style="margin-top: 20px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 15px; text-align: center; backdrop-filter: blur(10px);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div id="userAvatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">👤</div>
+                            <div>
+                                <div id="userEmail" style="color: white; font-weight: 600; font-size: 16px; margin-bottom: 4px;">游客模式</div>
+                                <div id="syncStatus" style="color: rgba(255, 255, 255, 0.8); font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                                    <span id="syncIndicator" style="width: 8px; height: 8px; background: #ffc107; border-radius: 50%; display: inline-block;"></span>
+                                    <span id="syncText">本地模式</span>
+                                </div>
+                                <div id="lastSyncTime" style="color: rgba(255, 255, 255, 0.6); font-size: 12px; margin-top: 2px;"></div>
+                            </div>
+                        </div>
+                        <div id="userActions" style="display: flex; gap: 12px;">
+                            <!-- 登录状态按钮 -->
+                            <button id="switchAccountBtn" onclick="switchAccount()" style="display: none; padding: 10px 18px; background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; font-size: 14px; cursor: pointer; transition: all 0.3s ease; font-weight: 500;" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'">🔄 切换账号</button>
+                            <button id="logoutBtn" onclick="logoutUser()" style="display: none; padding: 10px 18px; background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; font-size: 14px; cursor: pointer; transition: all 0.3s ease; font-weight: 500;" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'">🚪 退出登录</button>
+                            
+                            <!-- 游客模式按钮 -->
+                            <button id="loginBtn" onclick="showLoginModal()" style="padding: 10px 18px; background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; font-size: 14px; cursor: pointer; transition: all 0.3s ease; font-weight: 500;" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'">🔐 登录</button>
+                            
+                            <!-- 测试同步按钮（仅登录后显示） -->
+                            <button id="testSyncBtn" onclick="testFirebaseSync()" style="display: none; padding: 10px 18px; background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; font-size: 14px; cursor: pointer; transition: all 0.3s ease; font-weight: 500;" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'">🧪 测试同步</button>
+                            
+                            <!-- 退出预览模式按钮（仅预览模式显示） -->
+                            <button id="exitPreviewBtn" onclick="exitPreviewMode()" style="display: none; padding: 10px 18px; background: rgba(255, 152, 0, 0.8); color: white; border: 1px solid rgba(255, 152, 0, 0.5); border-radius: 25px; font-size: 14px; cursor: pointer; transition: all 0.3s ease; font-weight: 500;" onmouseover="this.style.background='rgba(255, 152, 0, 0.9)'" onmouseout="this.style.background='rgba(255, 152, 0, 0.8)'">🔄 退出预览</button>
                         </div>
                     </div>
+                </div>
         </div>
+
     </header>
+
+    <!-- 账号切换弹窗 -->
+    <div id="switchAccountModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 100001; align-items: center; justify-content: center;">
+        <div style="background: #fff; width: 92%; max-width: 480px; border-radius: 14px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);">
+            <h3 style="margin: 0 0 16px; color: #222; text-align: center; font-size: 20px; font-weight: 600;">🔄 切换账号</h3>
+            <p style="margin: 0 0 20px; color: #555; font-size: 14px; text-align: center;">选择要切换到的账号</p>
+            
+            <!-- 最近登录的账号列表 -->
+            <div id="recentAccountsList" style="margin-bottom: 20px;">
+                <!-- 动态生成最近账号 -->
+            </div>
+            
+            <!-- 其他登录选项 -->
+            <div style="border-top: 1px solid #eee; padding-top: 16px;">
+                <button onclick="showLoginModal(); hideSwitchAccountModal();" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-bottom: 10px; transition: background 0.3s;" onmouseover="this.style.background='#5568d3'" onmouseout="this.style.background='#667eea'">
+                    📧 使用邮箱登录
+                </button>
+                <button onclick="loginWithGoogle(); hideSwitchAccountModal();" style="width: 100%; padding: 12px; background: #4285f4; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-bottom: 10px; transition: background 0.3s;" onmouseover="this.style.background='#3367d6'" onmouseout="this.style.background='#4285f4'">
+                    🔍 使用 Google 登录
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 16px;">
+                <button onclick="hideSwitchAccountModal()" style="padding: 8px 16px; background: transparent; border: 1px solid #ddd; color: #666; border-radius: 20px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据同步选择弹窗 -->
+    <div id="mergeChoiceModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100001; align-items: center; justify-content: center;">
+        <div style="background: #fff; width: 90%; max-width: 500px; max-height: 85vh; border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+            <div style="padding: 24px 24px 0; flex-shrink: 0;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 8px;">🔄</div>
+                <h3 style="margin: 0 0 8px; color: #333; font-size: 20px; font-weight: 600;">数据同步选择</h3>
+                <p style="margin: 0; color: #666; font-size: 14px;">检测到本地数据，请选择同步方式</p>
+            </div>
+            
+            <div id="mergeChoiceSummary" style="margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 13px; color: #555; line-height: 1.5;"></div>
+            </div>
+            
+            <!-- 可滚动的内容区域 -->
+            <div class="custom-scrollbar" style="flex: 1; overflow-y: auto; padding: 0 24px; scrollbar-width: thin; scrollbar-color: #ddd #f5f5f5;">
+                <div style="display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px;">
+                <button onclick="chooseMergeStrategy('merge')" style="padding: 18px; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; border: none; border-radius: 12px; cursor: pointer; text-align: left; font-size: 15px; font-weight: 500; transition: all 0.3s; box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.3)'">
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="font-size: 24px; margin-top: 2px;">📤</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 6px; font-size: 16px;">📤 上传本地数据（推荐）</div>
+                            <div style="font-size: 13px; opacity: 0.95; line-height: 1.5; margin-bottom: 8px;">将本地的收藏、评分、已看视频上传到云端</div>
+                            <div style="font-size: 12px; opacity: 0.85; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 6px; line-height: 1.6;">
+                                <div><strong>效果：</strong></div>
+                                <div>✅ 本地数据保留不变</div>
+                                <div>✅ 云端数据更新为本地版本</div>
+                                <div>✅ 其他设备登录可看到这些数据</div>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+                
+                <button onclick="chooseMergeStrategy('cloud')" style="padding: 18px; background: #fff; color: #333; border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer; text-align: left; font-size: 15px; font-weight: 500; transition: all 0.3s;" onmouseover="this.style.borderColor='#2196F3'; this.style.backgroundColor='#f3f9ff'" onmouseout="this.style.borderColor='#e0e0e0'; this.style.backgroundColor='#fff'">
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="font-size: 24px; margin-top: 2px;">📥</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 6px; font-size: 16px; color: #333;">📥 下载云端数据</div>
+                            <div style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 8px;">用云端数据替换本地数据，恢复云端版本</div>
+                            <div style="font-size: 12px; color: #555; background: #f5f5f5; padding: 8px; border-radius: 6px; line-height: 1.6;">
+                                <div><strong>效果：</strong></div>
+                                <div>⚠️ 本地数据被覆盖（会丢失）</div>
+                                <div>✅ 云端数据下载到本地</div>
+                                <div>✅ 恢复到云端保存的版本</div>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+                
+                <button onclick="chooseMergeStrategy('preview')" style="padding: 18px; background: #fff; color: #333; border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer; text-align: left; font-size: 15px; font-weight: 500; transition: all 0.3s;" onmouseover="this.style.borderColor='#9C27B0'; this.style.backgroundColor='#faf5ff'" onmouseout="this.style.borderColor='#e0e0e0'; this.style.backgroundColor='#fff'">
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="font-size: 24px; margin-top: 2px;">👁️</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 6px; font-size: 16px; color: #333;">👁️ 预览云端数据</div>
+                            <div style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 8px;">显示云端内容，可以编辑并同步到云端</div>
+                            <div style="font-size: 12px; color: #555; background: #f5f5f5; padding: 8px; border-radius: 6px; line-height: 1.6;">
+                                <div><strong>效果：</strong></div>
+                                <div>✅ 本地数据会被安全备份</div>
+                                <div>✅ 界面显示云端数据内容</div>
+                                <div>✅ 新的编辑会同步到云端</div>
+                                <div>✅ 点击"退出预览"可恢复本地数据</div>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+                </div>
+            </div>
+            
+            <!-- 底部按钮区域 -->
+            <div style="padding: 20px 24px 24px; border-top: 1px solid #eee; flex-shrink: 0; background: #fff;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="font-size: 13px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <input id="rememberMergeChoice" type="checkbox" style="margin: 0;">
+                        记住我的选择
+                    </label>
+                    <button onclick="hideMergeChoiceModal()" style="padding: 8px 16px; background: transparent; border: 1px solid #ddd; color: #666; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 14px;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor='transparent'">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="controls">
         <div class="container">
             <div class="search-box">
@@ -8952,6 +9221,1024 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(forceLayoutFix, 1000);
 });
 
+</script>
+
+<!-- Firebase 配置和功能 -->
+<script>
+// ==================== Firebase 配置 ====================
+const firebaseConfig = {
+    apiKey: "AIzaSyACbwmf47nRU3M5Z2rV1fkJBdl63xgSrkk",
+    authDomain: "my--curater.firebaseapp.com",
+    projectId: "my--curater",
+    storageBucket: "my--curater.firebasestorage.app",
+    messagingSenderId: "626446829375",
+    appId: "1:626446829375:web:ba9fb2ad1436fbb5ce358a",
+    measurementId: "G-804RBDRKL3"
+};
+
+// 初始化 Firebase
+let firebaseInitialized = false;
+let auth = null;
+let db = null;
+let currentUser = null;
+
+// 账号历史管理
+let recentAccounts = [];
+let skippedLogin = false;
+
+// 从localStorage加载最近账号
+try {
+    recentAccounts = JSON.parse(localStorage.getItem('recentAccounts') || '[]');
+} catch (e) {
+    recentAccounts = [];
+}
+
+try {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.firestore();
+    firebaseInitialized = true;
+    console.log("✅ Firebase 初始化成功");
+} catch (error) {
+    console.error("❌ Firebase 初始化失败:", error);
+}
+
+// ==================== 用户管理功能 ====================
+function updateUserUI(user) {
+    const userEmail = document.getElementById('userEmail');
+    const userAvatar = document.getElementById('userAvatar');
+    const syncIndicator = document.getElementById('syncIndicator');
+    const syncText = document.getElementById('syncText');
+    const lastSyncTime = document.getElementById('lastSyncTime');
+    const switchAccountBtn = document.getElementById('switchAccountBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    if (user) {
+        // 用户已登录
+        console.log("✅ 用户已登录:", user.email);
+        
+        // 更新用户信息
+        if (userEmail) {
+            userEmail.textContent = user.email;
+        }
+        
+        if (userAvatar) {
+            userAvatar.textContent = user.email[0].toUpperCase();
+        }
+        
+        // 更新同步状态
+        if (syncIndicator) {
+            syncIndicator.style.background = '#28a745';
+        }
+        if (syncText) {
+            syncText.textContent = '数据已同步到云端';
+        }
+        
+        // 更新最后同步时间
+        if (lastSyncTime) {
+            lastSyncTime.textContent = `最后同步：${new Date().toLocaleString()}`;
+        }
+        
+        // 显示登录状态按钮，隐藏游客模式按钮
+        if (switchAccountBtn) switchAccountBtn.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (testSyncBtn) testSyncBtn.style.display = 'inline-block';
+        
+        // 根据预览模式状态显示/隐藏退出预览按钮
+        const exitPreviewBtn = document.getElementById('exitPreviewBtn');
+        if (exitPreviewBtn) {
+            exitPreviewBtn.style.display = window.isPreviewMode ? 'inline-block' : 'none';
+        }
+        
+        currentUser = user;
+        
+        // 更新最近账号列表
+        updateRecentAccounts(user);
+        
+        // 检查是否需要显示数据同步选择
+        setTimeout(() => {
+            checkAndShowMergeChoice();
+        }, 1000);
+    } else {
+        // 用户未登录 - 显示游客模式
+        console.log("❌ 用户未登录，显示游客模式");
+        
+        // 更新为游客模式显示
+        if (userEmail) {
+            userEmail.textContent = '游客模式';
+        }
+        
+        if (userAvatar) {
+            userAvatar.textContent = '👤';
+        }
+        
+        // 更新同步状态
+        if (syncIndicator) {
+            syncIndicator.style.background = '#ffc107';
+        }
+        if (syncText) {
+            syncText.textContent = '本地模式';
+        }
+        
+        // 清空最后同步时间
+        if (lastSyncTime) {
+            lastSyncTime.textContent = '';
+        }
+        
+        // 隐藏登录状态按钮，显示游客模式按钮
+        if (switchAccountBtn) switchAccountBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (testSyncBtn) testSyncBtn.style.display = 'none';
+        
+        // 隐藏退出预览按钮（游客模式下不显示）
+        const exitPreviewBtn = document.getElementById('exitPreviewBtn');
+        if (exitPreviewBtn) {
+            exitPreviewBtn.style.display = 'none';
+        }
+        
+        currentUser = null;
+    }
+}
+
+// ==================== 登录功能 ====================
+function loginUser() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showError('请填写邮箱和密码');
+        return;
+    }
+    
+    if (!firebaseInitialized || !auth) {
+        showError('Firebase 未初始化，请刷新页面重试');
+        return;
+    }
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log("✅ 登录成功:", userCredential.user.email);
+            hideLoginModal();
+            updateUserUI(userCredential.user);
+            
+            // 登录成功后显示数据同步选择
+            setTimeout(() => {
+                // 检查是否有本地数据
+                const hasLocalData = favorites.length > 0 || 
+                                    channelsData.flatMap(cat => cat.channels).some(c => c.rating > 0) ||
+                                    Object.values(watchedVideos).some(videos => videos.length > 0);
+                
+                if (hasLocalData) {
+                    showMergeChoiceModal();
+                } else {
+                    // 没有本地数据，直接加载云端数据
+                    loadUserDataFromFirestore();
+                }
+            }, 1000);
+        })
+        .catch((error) => {
+            console.error("❌ 登录失败:", error);
+            let message = '登录失败，请检查邮箱和密码';
+            if (error.code === 'auth/user-not-found') message = '该邮箱未注册';
+            if (error.code === 'auth/wrong-password') message = '密码错误';
+            if (error.code === 'auth/invalid-email') message = '邮箱格式不正确';
+            showError(message);
+        });
+}
+
+function registerUser() {
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+    
+    if (!email || !password || !passwordConfirm) {
+        showError('请填写所有字段');
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+        showError('两次输入的密码不一致');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showError('密码至少需要6位');
+        return;
+    }
+    
+    if (!firebaseInitialized || !auth) {
+        showError('Firebase 未初始化，请刷新页面重试');
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log("✅ 注册成功:", userCredential.user.email);
+            
+            // 发送邮箱验证邮件
+            userCredential.user.sendEmailVerification()
+                .then(() => {
+                    console.log("📧 验证邮件已发送到:", userCredential.user.email);
+                    showSuccessMessage(`注册成功！验证邮件已发送到 ${userCredential.user.email}，请查收并点击验证链接。`);
+                })
+                .catch((error) => {
+                    console.error("❌ 发送验证邮件失败:", error);
+                    showSuccessMessage("注册成功！但验证邮件发送失败，您可以稍后手动验证邮箱。");
+                });
+            
+            hideLoginModal();
+            updateUserUI(userCredential.user);
+            
+            // 注册成功后显示数据同步选择
+            setTimeout(() => {
+                const hasLocalData = favorites.length > 0 || 
+                                    channelsData.flatMap(cat => cat.channels).some(c => c.rating > 0) ||
+                                    Object.values(watchedVideos).some(videos => videos.length > 0);
+                
+                if (hasLocalData) {
+                    showMergeChoiceModal();
+                }
+            }, 1000);
+        })
+        .catch((error) => {
+            console.error("❌ 注册失败:", error);
+            let message = '注册失败，请重试';
+            if (error.code === 'auth/email-already-in-use') message = '该邮箱已被注册';
+            if (error.code === 'auth/invalid-email') message = '邮箱格式不正确';
+            if (error.code === 'auth/weak-password') message = '密码太弱，请使用更复杂的密码';
+            showError(message);
+        });
+}
+
+function switchToRegister() {
+    document.getElementById('loginFormDiv').style.display = 'none';
+    document.getElementById('registerFormDiv').style.display = 'block';
+    document.getElementById('switchToRegisterBtn').style.display = 'none';
+    document.getElementById('switchToLoginBtn').style.display = 'inline';
+}
+
+function switchToLogin() {
+    document.getElementById('registerFormDiv').style.display = 'none';
+    document.getElementById('loginFormDiv').style.display = 'block';
+    document.getElementById('switchToLoginBtn').style.display = 'none';
+    document.getElementById('switchToRegisterBtn').style.display = 'inline';
+}
+
+function loginWithGoogle() {
+    if (!firebaseInitialized || !auth) {
+        showError('Firebase 未初始化，请刷新页面重试');
+        return;
+    }
+    
+    if (location.protocol === 'file:' || location.protocol === 'chrome-extension:') {
+        showError('Google 登录需要在 HTTP 环境下运行，请使用 http://localhost:8001/index_simple.html 访问');
+        return;
+    }
+    
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log("✅ Google 登录成功:", result.user.email);
+            hideLoginModal();
+            updateUserUI(result.user);
+            
+            // Google登录成功后显示数据同步选择
+            setTimeout(() => {
+                const hasLocalData = favorites.length > 0 || 
+                                    channelsData.flatMap(cat => cat.channels).some(c => c.rating > 0) ||
+                                    Object.values(watchedVideos).some(videos => videos.length > 0);
+                
+                if (hasLocalData) {
+                    showMergeChoiceModal();
+                } else {
+                    loadUserDataFromFirestore();
+                }
+            }, 1000);
+        })
+        .catch((error) => {
+            console.error("❌ Google 登录失败:", error);
+            let message = 'Google 登录失败，请重试';
+            if (error.code === 'auth/popup-closed-by-user') message = '登录被取消';
+            if (error.code === 'auth/popup-blocked') message = '弹窗被阻止，请允许弹窗后重试';
+            showError(message);
+        });
+}
+
+function skipLogin() {
+    console.log("🚀 跳过登录，使用本地版本");
+    hideLoginModal();
+    skippedLogin = true;
+    console.log("✅ 本地版本已启用");
+}
+
+// 显示/隐藏本地模式横幅
+function showLocalModeBanner(visible) {
+    const banner = document.getElementById('localModeBanner');
+    if (banner) {
+        banner.style.display = visible ? 'block' : 'none';
+    }
+}
+
+// 显示/隐藏登录悬浮按钮
+function showLoginFab(visible) {
+    const fab = document.getElementById('loginFab');
+    if (fab) {
+        fab.style.display = visible ? 'block' : 'none';
+    }
+}
+
+// 从横幅或FAB打开登录
+function openLoginFromBanner() {
+    showLoginModal();
+}
+
+// 更新最近账号列表
+function updateRecentAccounts(user) {
+    if (!user) return;
+    
+    const account = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0],
+        lastLogin: Date.now()
+    };
+    
+    // 移除已存在的相同账号
+    recentAccounts = recentAccounts.filter(acc => acc.uid !== user.uid);
+    
+    // 添加到列表开头
+    recentAccounts.unshift(account);
+    
+    // 只保留最近5个账号
+    recentAccounts = recentAccounts.slice(0, 5);
+    
+    // 保存到localStorage
+    try {
+        localStorage.setItem('recentAccounts', JSON.stringify(recentAccounts));
+    } catch (e) {
+        console.warn('无法保存最近账号到localStorage:', e);
+    }
+}
+
+// 显示账号切换弹窗
+function showSwitchAccountModal() {
+    const modal = document.getElementById('switchAccountModal');
+    if (!modal) return;
+    
+    // 生成最近账号列表
+    renderRecentAccounts();
+    
+    modal.style.display = 'flex';
+}
+
+// 隐藏账号切换弹窗
+function hideSwitchAccountModal() {
+    const modal = document.getElementById('switchAccountModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// 渲染最近账号列表
+function renderRecentAccounts() {
+    const container = document.getElementById('recentAccountsList');
+    if (!container) return;
+    
+    if (recentAccounts.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; font-size: 14px; margin: 20px 0;">暂无最近登录的账号</p>';
+        return;
+    }
+    
+    container.innerHTML = recentAccounts.map(account => {
+        const isCurrent = currentUser && account.uid === currentUser.uid;
+        const lastLoginTime = new Date(account.lastLogin).toLocaleString();
+        
+        return `
+            <div style="display: flex; align-items: center; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; ${isCurrent ? 'background: #f0f8ff; border-color: #4a67ff;' : 'background: #f9f9f9;'}">
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">
+                    ${account.displayName[0].toUpperCase()}
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 500; color: #222; margin-bottom: 2px;">${account.displayName}</div>
+                    <div style="font-size: 12px; color: #666;">${account.email}</div>
+                    <div style="font-size: 11px; color: #999;">最后登录：${lastLoginTime}</div>
+                </div>
+                ${isCurrent ? 
+                    '<div style="color: #4a67ff; font-size: 12px; font-weight: 500;">当前账号</div>' :
+                    `<button onclick="switchToAccount('${account.uid}')" style="padding: 6px 12px; background: #4a67ff; color: white; border: none; border-radius: 16px; font-size: 12px; cursor: pointer;">切换</button>`
+                }
+            </div>
+        `;
+    }).join('');
+}
+
+// 切换到指定账号
+function switchToAccount(uid) {
+    const account = recentAccounts.find(acc => acc.uid === uid);
+    if (!account) return;
+    
+    console.log(`🔄 切换到账号: ${account.email}`);
+    
+    // 先保存当前数据
+    if (currentUser) {
+        saveDataToFirestore();
+    }
+    
+    // 退出当前账号
+    auth.signOut().then(() => {
+        console.log("✅ 已退出当前账号");
+        
+        // 显示登录弹窗，预填充邮箱
+        showLoginModal();
+        const emailInput = document.getElementById('loginEmail');
+        if (emailInput) {
+            emailInput.value = account.email;
+        }
+        
+        hideSwitchAccountModal();
+        showSuccessMessage(`已准备切换到 ${account.email}，请输入密码`);
+    }).catch((error) => {
+        console.error("❌ 退出账号失败:", error);
+        showErrorMessage("切换账号失败，请重试");
+    });
+}
+
+// 显示数据同步选择弹窗
+function showMergeChoiceModal() {
+    const modal = document.getElementById('mergeChoiceModal');
+    if (!modal) return;
+    
+    // 统计本地数据
+    const localFavorites = favorites.length;
+    const localRatings = channelsData.flatMap(cat => cat.channels).filter(c => c.rating > 0).length;
+    const localWatched = Object.values(watchedVideos).reduce((sum, videos) => sum + videos.length, 0);
+    
+    const summary = document.getElementById('mergeChoiceSummary');
+    if (summary) {
+        let summaryText = `本地数据统计：`;
+        if (localFavorites > 0) summaryText += ` ${localFavorites} 个收藏频道`;
+        if (localRatings > 0) summaryText += `，${localRatings} 个评分`;
+        if (localWatched > 0) summaryText += `，${localWatched} 个已看视频`;
+        summaryText += `。请选择如何处理这些数据。`;
+        summary.textContent = summaryText;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// 隐藏合并选择弹窗
+function hideMergeChoiceModal() {
+    const modal = document.getElementById('mergeChoiceModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// 选择数据同步策略
+function chooseMergeStrategy(strategy) {
+    console.log(`📊 选择同步策略: ${strategy}`);
+    
+    const rememberChoice = document.getElementById('rememberMergeChoice')?.checked;
+    if (rememberChoice) {
+        localStorage.setItem('mergeStrategy', strategy);
+    }
+    
+    hideMergeChoiceModal();
+    
+    switch (strategy) {
+        case 'merge':
+            // 上传本地数据：将本地数据保存到云端
+            console.log("📤 执行上传本地数据策略");
+            saveDataToFirestore();
+            showSuccessMessage("本地数据已上传到云端");
+            break;
+        case 'cloud':
+            // 下载云端数据：用云端数据覆盖本地
+            console.log("📥 执行下载云端数据策略");
+            loadUserDataFromFirestore();
+            showSuccessMessage("已下载云端数据");
+            break;
+        case 'preview':
+            // 预览云端数据：查看云端数据但不改变本地
+            console.log("👁️ 执行预览云端数据策略");
+            previewCloudData();
+            break;
+    }
+}
+
+// 预览云端数据 - 显示云端内容，新编辑同步到云端，但本地数据不变
+function previewCloudData() {
+    if (!currentUser || !db) {
+        showErrorMessage("无法预览云端数据");
+        return;
+    }
+    
+    console.log("👁️ 开始预览云端数据");
+    showSuccessMessage("正在加载云端数据...");
+    
+    db.collection('users').doc(currentUser.uid).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                console.log("✅ 云端数据预览:", data);
+                
+                // 备份本地数据
+                const localBackup = {
+                    favorites: [...favorites],
+                    watchedVideos: JSON.parse(JSON.stringify(watchedVideos)),
+                    channelsData: JSON.parse(JSON.stringify(channelsData))
+                };
+                
+                // 保存备份到全局变量
+                window.localDataBackup = localBackup;
+                
+                // 加载云端数据到界面显示
+                if (data.favorites) {
+                    favorites.splice(0, favorites.length, ...data.favorites);
+                }
+                
+                if (data.watchedVideos) {
+                    Object.keys(watchedVideos).forEach(key => delete watchedVideos[key]);
+                    Object.assign(watchedVideos, data.watchedVideos);
+                }
+                
+                if (data.ratings) {
+                    data.ratings.forEach(rating => {
+                        channelsData.forEach(category => {
+                            category.channels.forEach(channel => {
+                                if (channel.name === rating.name) {
+                                    channel.rating = rating.rating;
+                                }
+                            });
+                        });
+                    });
+                }
+                
+                // 重新渲染界面
+                if (currentView === 'favorites') {
+                    renderFavoritesPage();
+                } else if (currentView === 'watched') {
+                    renderWatchedVideosPage();
+                } else {
+                    renderChannels(channelsData);
+                }
+                
+                updateFavoritesCount();
+                updateWatchedCount();
+                
+                // 统计云端数据
+                const cloudFavorites = data.favorites ? data.favorites.length : 0;
+                const cloudRatings = data.ratings ? data.ratings.filter(r => r.rating > 0).length : 0;
+                const cloudWatched = data.watchedVideos ? Object.values(data.watchedVideos).reduce((sum, videos) => sum + videos.length, 0) : 0;
+                
+                const previewMessage = `👁️ 预览模式已启用！\n\n` +
+                    `📚 收藏频道：${cloudFavorites} 个\n` +
+                    `⭐ 频道评分：${cloudRatings} 个\n` +
+                    `📺 已看视频：${cloudWatched} 个\n\n` +
+                    `💡 提示：\n` +
+                    `• 当前显示云端数据\n` +
+                    `• 新编辑会同步到云端\n` +
+                    `• 本地数据已备份，不会丢失\n` +
+                    `• 退出预览模式可恢复本地数据`;
+                
+                showSuccessMessage(previewMessage);
+                
+        // 设置预览模式标志
+        window.isPreviewMode = true;
+        
+        // 显示退出预览按钮
+        const exitPreviewBtn = document.getElementById('exitPreviewBtn');
+        if (exitPreviewBtn) {
+            exitPreviewBtn.style.display = 'inline-block';
+        }
+                
+            } else {
+                showSuccessMessage("云端暂无数据，本地数据保持不变");
+            }
+        })
+        .catch((error) => {
+            console.error("❌ 预览云端数据失败:", error);
+            showErrorMessage("预览云端数据失败，请重试");
+        });
+}
+
+// 退出预览模式 - 恢复本地数据
+function exitPreviewMode() {
+    if (!window.isPreviewMode || !window.localDataBackup) {
+        showErrorMessage("当前不在预览模式");
+        return;
+    }
+    
+    console.log("🔄 退出预览模式，恢复本地数据");
+    
+    // 恢复本地数据
+    const backup = window.localDataBackup;
+    
+    // 恢复收藏
+    favorites.splice(0, favorites.length, ...backup.favorites);
+    
+    // 恢复已看视频
+    Object.keys(watchedVideos).forEach(key => delete watchedVideos[key]);
+    Object.assign(watchedVideos, backup.watchedVideos);
+    
+    // 恢复频道评分
+    channelsData.splice(0, channelsData.length, ...backup.channelsData);
+    
+    // 重新渲染界面
+    if (currentView === 'favorites') {
+        renderFavoritesPage();
+    } else if (currentView === 'watched') {
+        renderWatchedVideosPage();
+    } else {
+        renderChannels(channelsData);
+    }
+    
+    updateFavoritesCount();
+    updateWatchedCount();
+    
+    // 清除预览模式标志
+    window.isPreviewMode = false;
+    window.localDataBackup = null;
+    
+    // 隐藏退出预览按钮
+    const exitPreviewBtn = document.getElementById('exitPreviewBtn');
+    if (exitPreviewBtn) {
+        exitPreviewBtn.style.display = 'none';
+    }
+    
+    showSuccessMessage("✅ 已退出预览模式，本地数据已恢复");
+}
+
+// 检查是否需要显示合并选择
+function checkAndShowMergeChoice() {
+    // 检查是否是页面刷新（避免刷新时弹出）
+    const isPageRefresh = performance.navigation.type === 1 || 
+                         performance.getEntriesByType('navigation')[0].type === 'reload';
+    
+    if (isPageRefresh) {
+        console.log("📊 页面刷新，跳过合并选择检查");
+        return;
+    }
+    
+    // 检查是否有本地数据
+    const hasLocalData = favorites.length > 0 || 
+                        channelsData.flatMap(cat => cat.channels).some(c => c.rating > 0) ||
+                        Object.values(watchedVideos).some(videos => videos.length > 0);
+    
+    if (!hasLocalData) {
+        console.log("📊 无本地数据，无需合并选择");
+        return;
+    }
+    
+    // 检查是否已记住选择
+    const savedStrategy = localStorage.getItem('mergeStrategy');
+    if (savedStrategy) {
+        console.log(`📊 使用已保存的合并策略: ${savedStrategy}`);
+        chooseMergeStrategy(savedStrategy);
+        return;
+    }
+    
+    // 显示数据同步选择弹窗
+    console.log("📊 显示数据同步选择弹窗");
+    showMergeChoiceModal();
+}
+
+function logoutUser() {
+    console.log("🚪 退出登录");
+    
+    // 显示确认对话框
+    const confirmLogout = confirm("确定要退出登录吗？\n\n退出后：\n• 当前数据已保存到云端\n• 下次登录会恢复所有数据\n• 可以随时重新登录");
+    
+    if (!confirmLogout) {
+        console.log("用户取消退出登录");
+        return;
+    }
+    
+    if (!firebaseInitialized || !auth) {
+        console.log("Firebase 未初始化，直接隐藏用户信息");
+        updateUserUI(null);
+        showLoginModal();
+        return;
+    }
+    
+    // 先保存当前数据到云端
+    if (currentUser) {
+        saveDataToFirestore();
+    }
+    
+    auth.signOut().then(() => {
+        console.log("✅ 退出登录成功");
+        updateUserUI(null);
+        
+        // 显示成功提示
+        showSuccessMessage("已成功退出登录，数据已保存到云端");
+    }).catch((error) => {
+        console.error("❌ 退出登录失败:", error);
+        showErrorMessage("退出登录失败，请重试");
+    });
+}
+
+function showLoginModal() {
+    console.log("🔧 显示登录弹窗");
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.style.display = 'flex';
+    }
+}
+
+// 切换账号功能 - 显示账号切换弹窗
+function switchAccount() {
+    console.log("🔄 切换账号");
+    
+    if (!firebaseInitialized || !auth || !currentUser) {
+        console.log("Firebase 未初始化或无当前用户，直接显示登录弹窗");
+        showLoginModal();
+        return;
+    }
+    
+    // 先保存当前数据到云端
+    if (currentUser) {
+        saveDataToFirestore();
+    }
+    
+    // 显示账号切换弹窗
+    showSwitchAccountModal();
+}
+
+function hideLoginModal() {
+    console.log("🔧 隐藏登录弹窗");
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.style.display = 'none';
+    }
+}
+
+function showError(message) {
+    const errorEl = document.getElementById('loginError');
+    if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+        setTimeout(() => {
+            errorEl.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// 显示成功消息
+function showSuccessMessage(message) {
+    showToast(message, 'success');
+}
+
+// 显示错误消息
+function showErrorMessage(message) {
+    showToast(message, 'error');
+}
+
+// 通用消息提示
+function showToast(message, type = 'info') {
+    // 创建消息提示元素
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        font-size: 14px;
+        z-index: 1000000;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    
+    // 根据类型设置颜色
+    if (type === 'success') {
+        toast.style.backgroundColor = '#28a745';
+    } else if (type === 'error') {
+        toast.style.backgroundColor = '#dc3545';
+    } else {
+        toast.style.backgroundColor = '#17a2b8';
+    }
+    
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // 显示动画
+    setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // 自动隐藏
+    setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// ==================== 测试同步功能 ====================
+function testFirebaseSync() {
+    if (!currentUser || !db) {
+        showErrorMessage("Firebase 未初始化或用户未登录");
+        return;
+    }
+    
+    console.log("🧪 开始测试 Firebase 同步");
+    showSuccessMessage("正在测试 Firebase 同步...");
+    
+    // 测试写入数据
+    const testData = {
+        testMessage: "Firebase 同步测试",
+        testTime: new Date().toISOString(),
+        userEmail: currentUser.email,
+        testId: Math.random().toString(36).substr(2, 9)
+    };
+    
+    db.collection('test').doc(currentUser.uid).set(testData)
+        .then(() => {
+            console.log("✅ 测试数据写入成功");
+            
+            // 测试读取数据
+            return db.collection('test').doc(currentUser.uid).get();
+        })
+        .then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                console.log("✅ 测试数据读取成功:", data);
+                
+                // 验证数据
+                if (data.userEmail === currentUser.email) {
+                    showSuccessMessage(`✅ Firebase 同步正常！\n邮箱: ${currentUser.email}\n测试ID: ${data.testId}`);
+                } else {
+                    showErrorMessage("❌ 数据验证失败");
+                }
+            } else {
+                showErrorMessage("❌ 测试数据不存在");
+            }
+        })
+        .catch((error) => {
+            console.error("❌ Firebase 测试失败:", error);
+            showErrorMessage(`❌ Firebase 测试失败: ${error.message}`);
+        });
+}
+
+// ==================== 数据同步功能 ====================
+function loadUserDataFromFirestore() {
+    if (!currentUser || !db) return;
+    
+    console.log("📦 从 Firestore 加载用户数据");
+    db.collection('users').doc(currentUser.uid).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                console.log("✅ 云端数据加载成功:", data);
+                
+                // 恢复收藏数据
+                if (data.favorites && Array.isArray(data.favorites)) {
+                    favorites.length = 0;
+                    favorites.push(...data.favorites);
+                    console.log(`✅ 已恢复 ${favorites.length} 个收藏频道`);
+                }
+                
+                // 恢复评分数据
+                if (data.ratings && Array.isArray(data.ratings)) {
+                    data.ratings.forEach(rating => {
+                        channelsData.forEach(category => {
+                            category.channels.forEach(channel => {
+                                if (channel.name === rating.name) {
+                                    channel.rating = rating.rating;
+                                }
+                            });
+                        });
+                    });
+                    console.log(`✅ 已恢复 ${data.ratings.length} 个频道评分`);
+                }
+                
+                // 恢复已看视频数据
+                if (data.watchedVideos) {
+                    Object.assign(watchedVideos, data.watchedVideos);
+                    const totalVideos = Object.values(watchedVideos).reduce((sum, videos) => sum + videos.length, 0);
+                    console.log(`✅ 已恢复 ${Object.keys(watchedVideos).length} 个频道的 ${totalVideos} 个已看视频`);
+                }
+                
+                // 更新UI
+                if (typeof updateFavoritesCount === 'function') updateFavoritesCount();
+                if (typeof updateWatchedCount === 'function') updateWatchedCount();
+                if (typeof renderChannels === 'function') renderChannels(channelsData);
+            } else {
+                console.log("📝 用户数据不存在，将创建新文档");
+                saveDataToFirestore();
+            }
+        })
+        .catch((error) => {
+            console.error("❌ 加载云端数据失败:", error);
+        });
+}
+
+function saveDataToFirestore() {
+    if (!currentUser || !db) return;
+    
+    console.log("💾 保存数据到 Firestore");
+    const data = {
+        favorites: favorites,
+        ratings: channelsData.flatMap(category => 
+            category.channels.map(channel => ({
+                name: channel.name,
+                rating: channel.rating || 0
+            }))
+        ),
+        watchedVideos: watchedVideos,
+        userEmail: currentUser.email,
+        userDisplayName: currentUser.displayName || currentUser.email.split('@')[0],
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    db.collection('users').doc(currentUser.uid).set(data, { merge: true })
+        .then(() => {
+            console.log("✅ 数据已保存到云端");
+            console.log("📊 保存的数据统计:", {
+                favorites: favorites.length,
+                ratings: data.ratings.filter(r => r.rating > 0).length,
+                watchedVideos: Object.values(watchedVideos).reduce((sum, videos) => sum + videos.length, 0),
+                userEmail: currentUser.email
+            });
+            
+            // 更新最后同步时间显示
+            const lastSyncTime = document.getElementById('lastSyncTime');
+            if (lastSyncTime) {
+                lastSyncTime.textContent = `最后同步：${new Date().toLocaleString()}`;
+            }
+            
+            // 显示同步成功提示
+            showSuccessMessage(`数据已同步到云端 (${currentUser.email})`);
+        })
+        .catch((error) => {
+            console.error("❌ 保存数据失败:", error);
+            showErrorMessage("数据同步失败，请检查网络连接");
+        });
+}
+
+// ==================== 监听认证状态变化 ====================
+if (auth) {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log("👤 用户已登录:", user.email);
+            updateUserUI(user);
+            // 用户已登录，隐藏登录弹窗
+            hideLoginModal();
+        } else {
+            console.log("👤 用户未登录");
+            updateUserUI(null);
+            // 用户未登录时，只在页面首次加载时显示登录弹窗
+            // 不在这里自动显示，让用户主动点击"登录"按钮
+        }
+    });
+}
+
+// ==================== 页面加载完成后的初始化 ====================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("📄 页面加载完成");
+    
+    // 确保所有弹窗在页面加载时都是隐藏的
+    hideLoginModal();
+    hideSwitchAccountModal();
+    hideMergeChoiceModal();
+    
+    // 检查是否是首次访问（没有登录状态记录）
+    const hasVisited = localStorage.getItem('hasVisited');
+    if (!hasVisited) {
+        // 首次访问，显示登录弹窗
+        const loginModal = document.getElementById('loginModal');
+        if (loginModal) {
+            loginModal.style.display = 'flex';
+            console.log("🔧 首次访问，显示登录弹窗");
+        }
+        localStorage.setItem('hasVisited', 'true');
+    } else {
+        // 非首次访问，等待认证状态确定
+        console.log("🔧 非首次访问，等待认证状态确定");
+    }
+    
+    // 监听数据变化，自动保存到云端
+    if (typeof saveAllData === 'function') {
+        const originalSaveAllData = saveAllData;
+        saveAllData = function() {
+            originalSaveAllData();
+            if (currentUser) {
+                saveDataToFirestore();
+            }
+        };
+    }
+});
 </script>
 </body>
 </html>
